@@ -1,0 +1,19 @@
+{{template "base.html"}}
+
+{{define "css"}}to_do.css{{end}}
+{{define "title"}}To Do list{{end}}
+
+<form action="/to-do" method="post">
+	<input type="text" name="item_content" placeholder="Add an item">
+	<button type="submit">&#43;</button>
+</form>
+
+<button hx-get="/reset-list">Reset</button>
+
+<div id="item_list">
+	{{range .}} 
+	<ul id="item">
+		{{.}}
+	</ul>
+	{{end}}
+</div>
