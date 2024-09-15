@@ -3,17 +3,26 @@
 {{define "css"}}to_do.css{{end}}
 {{define "title"}}To Do list{{end}}
 
-<form action="/to-do" method="post">
-	<input type="text" name="item_content" placeholder="Add an item">
-	<button type="submit">&#43;</button>
+<p id="title"><b>To-do list :D</b></p>
+
+<form id="form" autocomplete="off">
+	<input id="item_input" type="text" name="item_content" placeholder="Add an item">
+	<button id="add_button" hx-post="/add-to-do" hx-target="#item_list" hx-swap="none" type="submit">
+		&#43;
+	</button>
 </form>
 
-<button hx-get="/reset-list">Reset</button>
 
-<div id="item_list">
-	{{range .}} 
-	<ul id="item">
-		{{.}}
-	</ul>
+<div id="item_list" hx-swap="innerHTML">
+	{{range .}}
+		<ul id="item">
+			<span id="item_id">
+				{{.Item_number}}
+			</span>
+
+			<span id="item_id">
+			{{.Item_content}}
+			</span>
+		</ul>
 	{{end}}
 </div>

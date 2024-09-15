@@ -2,10 +2,12 @@ package main
 
 import (
 	"io"
+	"os"
 	"net/http"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"html/template"
+	"github.com/rs/zerolog"
 )
 
 type Template struct {
@@ -24,6 +26,7 @@ func newTemplate() *Template {
 func main() {
 	e := echo.New()
 	e.Renderer = newTemplate()
+	// set the static folder
 	e.Static("/static", "static")
 	// router
 	e.GET("/", func (c echo.Context) error {
@@ -31,12 +34,26 @@ func main() {
 	})
 
 	e.GET("/to-do", to_do)
-	e.POST("/to-do", to_do)
-	e.GET("/reset-list", reset)
+	e.POST("/reset-list", reset)
+	e.POST("/add-to-do", add_to_do)
+	e.POST("/get-to-do", get_to_do)
 
 	// middleware
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "method=${method}, uri=${uri}, status=${status}\n",
-	}))
+
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			logger.Info().
+			Str("URI", v.URI).
+			Int("status", v.Status).
+			Msg("request")
+
+			return nil
+		},
+	}))	
+
+	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
 }
