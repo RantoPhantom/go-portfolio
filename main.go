@@ -34,9 +34,8 @@ func main() {
 	})
 
 	e.GET("/to-do", to_do)
-	e.POST("/reset-list", reset)
-	e.POST("/add-to-do", add_to_do)
-	e.POST("/get-to-do", get_to_do)
+	e.DELETE("/reset-list", reset)
+	e.PUT("/add-to-do", add_to_do)
 
 	// middleware
 
