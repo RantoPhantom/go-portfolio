@@ -66,4 +66,5 @@ func main() {
 	}
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
+	defer db.Close()
 }

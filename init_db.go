@@ -13,9 +13,13 @@ func init_db() (*sql.DB, error) {
 	}
 
 	pingErr := db.Ping()
-
 	if pingErr != nil {
 		return nil, pingErr
+	}
+
+	_,createErr := db.Exec("CREATE TABLE IF NOT EXISTS todo (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)")
+	if createErr != nil {
+		return nil, createErr
 	}
 
 	return db, nil

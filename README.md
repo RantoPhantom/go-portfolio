@@ -8,8 +8,8 @@
 
 ## IMPORTANT
 - [x] add db
-- [ ] add caching for the item list
-- [ ] add PUT op
+- [ ] add caching for the item list (lol cannot do this)
+- [x] add PUT op
 - [ ] add DELETE op
 - [ ] add time to the items
 - [ ] add archive
