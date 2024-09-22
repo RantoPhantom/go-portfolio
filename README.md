@@ -1,13 +1,21 @@
 ## I want to make this the first ever complete project :D
 # This is just a simple to do list webapp made with golang + raw html and css and maybe some js
 
+## Might implement more pages and turn this into an aggregate of projects, may be a terrible idea :D
+
 
 # To do
-- [ ] make it work
-- [ ] make it usable/pretty
-- [ ] containerize it using docker
-- [ ] deploy it and use it every day
--- optional --
-- [ ] add time option for time-based tasks
-- [ ] make it so that it can notify me 
-- [ ] integrate it with other services
+
+## IMPORTANT
+- [x] add db
+- [ ] add caching for the item list
+- [ ] add PUT op
+- [ ] add DELETE op
+- [ ] add time to the items
+- [ ] add archive
+- [ ] deploy it with docker
+- [ ] ACTUALLY USE IT
+
+## less important
+- [ ] add reorganizing feature
+- [ ] add notification functionality
