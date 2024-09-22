@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"io"
 	"os"
 	"net/http"
@@ -23,16 +24,19 @@ func newTemplate() *Template {
 	}
 }
 
+var db *sql.DB
 func main() {
+	var err error
 	e := echo.New()
 	e.Renderer = newTemplate()
+
 	// set the static folder
 	e.Static("/static", "static")
+
 	// router
 	e.GET("/", func (c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
 	})
-
 	e.GET("/to-do", to_do)
 	e.DELETE("/reset-list", reset)
 	e.PUT("/add-to-do", add_to_do)
@@ -45,14 +49,21 @@ func main() {
 		LogStatus: true,
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			logger.Info().
+			Timestamp().
 			Str("URI", v.URI).
 			Int("status", v.Status).
 			Msg("request")
-
 			return nil
 		},
 	}))	
 
+	db, err = init_db()
+
+	if err != nil {
+		logger.Fatal().
+		Timestamp().
+		Err(err)
+	}
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
 }

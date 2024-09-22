@@ -1,14 +1,14 @@
 {{define "form"}}
 <div id="item_list">
 	{{range .}}
-		<ul id="item">
-			<span id="item_id">
-				{{.Item_number}}
-			</span>
-			<span id="item_id">
+	<ul id="item">
+		<span>
+			{{.Item_number}}
+		</span>
+		<span id="item_id">
 			{{.Item_content}}
-			</span>
-		</ul>
+		</span>
+	</ul>
 	{{end}}
 </div>
 {{end}}

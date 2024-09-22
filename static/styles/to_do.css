@@ -58,10 +58,13 @@
 	justify-self: center;
 }
 
+
 #item {
+	overflow-wrap: break-word;
+	width: 40%;
+	margin: 5px;
 	align-self: center;
 	background-color: lightgrey;
-	border: 2px solid black;
 	border-radius: 15px;
 	padding: 10px;
 }
