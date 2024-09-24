@@ -39,6 +39,21 @@ func fetch_todo_db() {
 	query_err = db.QueryRow("SELECT ID FROM todo ORDER BY id DESC;").Scan(&max_item_id)
 }
 
+func delete_item(c echo.Context) error {
+	id := c.Param("id")
+	fmt.Println(id)
+
+	query := fmt.Sprintf("DELETE FROM todo WHERE id=%s",id)
+	res,err := db.Exec(query)
+	log.Println(res)
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	return c.HTML(http.StatusOK, "item deleted")
+}
+
 func debug_error() error {
 	var output error
 	output = fmt.Errorf("asdadsfasdfasdf")

@@ -8,7 +8,7 @@
 
 ## IMPORTANT
 - [x] add db
-- [ ] add caching for the item list (lol cannot do this)
+- [ ] make the page lazily load
 - [x] add PUT op
 - [ ] add DELETE op
 - [ ] add time to the items
@@ -17,5 +17,6 @@
 - [ ] ACTUALLY USE IT
 
 ## less important
+- [ ] add caching for the item list (lol cannot do this)
 - [ ] add reorganizing feature
 - [ ] add notification functionality
