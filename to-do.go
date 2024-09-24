@@ -15,6 +15,7 @@ type item struct {
 var item_list []item
 var max_item_id int
 func to_do(c echo.Context) error {
+
 	fetch_todo_db()
 	return c.Render(http.StatusOK, "to-do.html", item_list)
 }
