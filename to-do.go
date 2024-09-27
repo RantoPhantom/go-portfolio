@@ -14,6 +14,7 @@ type item struct {
 
 var item_list []item
 var max_item_id int
+
 func to_do(c echo.Context) error {
 	err := fetch_todo_db()
 
@@ -76,12 +77,13 @@ func add_to_do(c echo.Context) error {
 		i := item{Item_number: max_item_id}
 		i.Item_content = item_input
 
-		query := fmt.Sprintf("insert into todo (content) values ('%s')", item_input)
+		query := fmt.Sprintf("insert into todo (content) values ('%s');", item_input)
+
 		_, err := db.Exec(query)
 		if err != nil {
-			log.Print(err)
 			return err
 		}
+
 		item_list = append(item_list, i)
 	}
 	return c.Render(http.StatusCreated, "form", item_list)
