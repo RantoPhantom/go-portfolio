@@ -1,7 +1,10 @@
 {{define "form"}}
 <div id="item_list">
-	{{range .}}
+	{{range $index, $val:= .}}
 	<ul id="item">
+		<span>
+			{{$index}}
+		</span>
 		<span id="item_id">
 			{{.Item_content}}
 		</span>
