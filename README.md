@@ -10,8 +10,8 @@
 - [x] add db
 - [ ] make the page lazily load
 - [x] add PUT op
-- [ ] add DELETE op
-- [x] add time to the items
+- [x] add DELETE op
+- [ ] add time to the items
 - [ ] add archive
 - [ ] deploy it with docker
 - [ ] ACTUALLY USE IT
