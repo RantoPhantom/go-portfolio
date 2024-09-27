@@ -15,16 +15,21 @@ type item struct {
 var item_list []item
 var max_item_id int
 func to_do(c echo.Context) error {
+	err := fetch_todo_db()
 
-	fetch_todo_db()
+	if err != nil {
+		return err
+	}
 	return c.Render(http.StatusOK, "to-do.html", item_list)
+
 }
 
-func fetch_todo_db() {
+func fetch_todo_db() error {
 	item_list = nil
 	rows, query_err := db.Query("SELECT * FROM todo;")
 	if query_err != nil {
 		log.Print(query_err)
+		return query_err
 	}
 
 	for rows.Next() {
@@ -38,6 +43,7 @@ func fetch_todo_db() {
 		item_list = append(item_list, item)
 	}
 	query_err = db.QueryRow("SELECT ID FROM todo ORDER BY id DESC;").Scan(&max_item_id)
+	return nil
 }
 
 func delete_item(c echo.Context) error {
@@ -50,6 +56,7 @@ func delete_item(c echo.Context) error {
 
 	if err != nil {
 		log.Print(err)
+		return err
 	}
 
 	return c.HTML(http.StatusOK, "item deleted")
@@ -73,7 +80,7 @@ func add_to_do(c echo.Context) error {
 		_, err := db.Exec(query)
 		if err != nil {
 			log.Print(err)
-			return c.JSON(http.StatusNoContent, "cannot insert into db")
+			return err
 		}
 		item_list = append(item_list, i)
 	}

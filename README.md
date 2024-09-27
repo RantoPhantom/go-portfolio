@@ -11,7 +11,7 @@
 - [ ] make the page lazily load
 - [x] add PUT op
 - [ ] add DELETE op
-- [ ] add time to the items
+- [x] add time to the items
 - [ ] add archive
 - [ ] deploy it with docker
 - [ ] ACTUALLY USE IT

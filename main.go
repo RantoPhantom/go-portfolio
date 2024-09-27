@@ -2,12 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"html/template"
 	"io"
-	"os"
 	"net/http"
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"html/template"
 	"github.com/rs/zerolog"
 )
 
@@ -46,25 +47,34 @@ func main() {
 
 	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogError: true,
 		LogURI:    true,
 		LogStatus: true,
+		HandleError: true,
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			logger.Info().
-			Timestamp().
-			Str("URI", v.URI).
-			Int("status", v.Status).
-			Msg("request")
+			if v.Error == nil {
+				logger.Info().
+				Timestamp().
+				Str("URI", v.URI).
+				Int("status", v.Status).
+				Msg("request")
+			} else {
+				logger.Error().
+				Timestamp().
+				Err(v.Error).
+				Str("URI", v.URI).
+				Int("status", v.Status).
+				Msg("request error")
+			}
 			return nil
 		},
-	}))	
+	}))
 
 	db, err = init_db()
-
 	if err != nil {
-		logger.Fatal().
-		Timestamp().
-		Err(err)
+		e.Logger.Fatal(err)
 	}
+
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
 	defer db.Close()
