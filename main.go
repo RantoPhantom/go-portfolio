@@ -64,11 +64,12 @@ func main() {
 				Err(v.Error).
 				Str("URI", v.URI).
 				Int("status", v.Status).
-				Msg("request error")
+				Msg("err:")
 			}
 			return nil
 		},
 	}))
+
 
 	db, err = init_db()
 	if err != nil {
