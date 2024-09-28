@@ -39,7 +39,6 @@ func main() {
 		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
 	})
 	e.GET("/to-do", to_do)
-	e.DELETE("/reset-list", reset)
 	e.DELETE("/to-do/:id", delete_item)
 	e.PUT("/add-to-do", add_to_do)
 
