@@ -37,15 +37,15 @@ func fetch_todo_db() error {
 
 	for rows.Next() {
 		var item item
-
 		rows.Scan(&item.Item_number, &item.Item_content, &item.Date_created, &item.Is_Done)
-
 		item_list = append(item_list, item)
 	}
+
 	query_err = db.QueryRow("SELECT COUNT(*) FROM todo").Scan(&max_item_id)
 	if query_err != nil {
 		return query_err
 	}
+
 	return nil
 }
 
@@ -60,12 +60,6 @@ func delete_item(c echo.Context) error {
 	}
 
 	return c.HTML(http.StatusOK, "item deleted")
-}
-
-func debug_error() error {
-	var output error
-	output = fmt.Errorf("asdadsfasdfasdf")
-	return output
 }
 
 func add_to_do(c echo.Context) error {
@@ -93,9 +87,4 @@ func add_to_do(c echo.Context) error {
 		item_list = append(item_list, i)
 	}
 	return c.Render(http.StatusCreated, "form", item_list)
-}
-
-func reset(c echo.Context) error {
-	item_list = nil
-	return c.Render(http.StatusNoContent, "form", item_list)
 }
