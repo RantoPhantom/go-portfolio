@@ -73,7 +73,7 @@ func add_to_do(c echo.Context) error {
 
 		query := fmt.Sprintf(`INSERT INTO todo (id, todo_content, date_created)
 		VALUES (%d, '%s', '%s');`,
-		max_item_id, 
+		i.Item_number, 
 		i.Item_content, 
 		i.Date_created,
 	)
@@ -82,9 +82,11 @@ func add_to_do(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		item_date, _ := time.Parse(time.RFC3339, i.Date_created)
-		i.Date_created = item_date.Format("2006-01-02 03:04:05")
-		item_list = append(item_list, i)
+
+		err = fetch_todo_db()
+		if err != nil {
+			return err
+		}
 	}
 	return c.Render(http.StatusCreated, "form", item_list)
 }
