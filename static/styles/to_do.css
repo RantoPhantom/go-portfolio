@@ -58,7 +58,6 @@
 	justify-self: center;
 }
 
-
 #item {
 	overflow-wrap: break-word;
 	width: 40%;
@@ -67,11 +66,9 @@
 	background-color: lightgrey;
 	border-radius: 15px;
 	padding: 10px;
-
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
-
 }
 
 #item:hover {

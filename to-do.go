@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"log"
 	"net/http"
+	"strings"
+	"time"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -65,28 +67,25 @@ func delete_item(c echo.Context) error {
 func add_to_do(c echo.Context) error {
 	var item_input string = c.FormValue("item_content")
 
-	if item_input != "" {
-		max_item_id += 1
-		i := item{Item_number: max_item_id}
-		i.Item_content = item_input
-		i.Date_created = time.Now().Format(time.RFC3339)
+	max_item_id += 1
+	i := item{Item_number: max_item_id}
+	i.Item_content = strings.TrimSpace(item_input)
+	i.Date_created = time.Now().Format(time.RFC3339)
 
-		query := fmt.Sprintf(`INSERT INTO todo (id, todo_content, date_created)
-		VALUES (%d, '%s', '%s');`,
-		i.Item_number, 
-		i.Item_content, 
-		i.Date_created,
-	)
+	query := fmt.Sprintf(`INSERT INTO todo (id, todo_content, date_created)
+	VALUES (%d, '%s', '%s');`,
+	i.Item_number, 
+	i.Item_content, 
+	i.Date_created,)
 
-		_, err := db.Exec(query)
-		if err != nil {
-			return err
-		}
-
-		err = fetch_todo_db()
-		if err != nil {
-			return err
-		}
+	_, err := db.Exec(query)
+	if err != nil {
+		return err
 	}
-	return c.Render(http.StatusCreated, "form", item_list)
+
+	err = fetch_todo_db()
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "form", item_list)
 }
