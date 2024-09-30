@@ -67,4 +67,29 @@
 	background-color: lightgrey;
 	border-radius: 15px;
 	padding: 10px;
+
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
 }
+
+#item:hover {
+	background-color: #c1c1c1;
+}
+
+#delete_button {
+
+	flex-basis: auto;
+	flex-grow: 0;
+
+	width: 4.25%;
+	height: 4.25%;
+
+	display: none;
+	margin-left: auto;
+}
+#item:hover > #delete_button{
+	display: block;
+}
+

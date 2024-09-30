@@ -2,19 +2,12 @@
 <div id="item_list">
 	{{range $index, $val:= .}}
 	<ul id="item">
-		<span>
-			{{$index}}
-		</span>
+
 		<span id="item_id">
 			{{.Item_content}}
 		</span>
-		<span>
-			{{.Date_created}}
-		</span>
 
-		<button id="delete_item" hx-delete="/to-do/{{.Item_number}}" >
-			Delete
-		</button>
+		<img id="delete_button" hx-delete="/to-do/{{.Item_number}}" hx-swap="innerHTML" src="./static/icons/delete_button.svg" alt="delete item">
 	</ul>
 	{{end}}
 </div>
