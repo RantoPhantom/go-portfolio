@@ -5,9 +5,9 @@
 
 <p id="title"><b>To-do list :D</b></p>
 
-<form id="form" autocomplete="off">
+<form class="form" autocomplete="off">
 	<input id="item_input" type="text" name="item_content" placeholder="Add an item" required>
-	<button id="add_button" hx-put="/add-to-do" hx-target="#item_list" hx-swap="outerHTML" type="submit">
+	<button id="add_button" hx-put="/add-to-do" hx-target=".item_list" hx-swap="outerHTML" type="submit">
 		&#43;
 	</button>
 </form>
