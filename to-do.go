@@ -43,7 +43,7 @@ func fetch_todo_db() error {
 		item_list = append(item_list, item)
 	}
 
-	query_err = db.QueryRow("SELECT COUNT(*) FROM todo").Scan(&max_item_id)
+	query_err = db.QueryRow("select ifnull(max(id), 0) from todo;").Scan(&max_item_id)
 	if query_err != nil {
 		return query_err
 	}
