@@ -1,4 +1,4 @@
-package main
+package todo
 
 import (
 	"fmt"
@@ -7,8 +7,20 @@ import (
 	"strings"
 	"time"
 
+	db "learning/to-do/db"
 	"github.com/labstack/echo/v4"
 )
+
+var Db, err = db.GetDB()
+func init_db() error {
+	if Db == nil{
+		Db, err = db.GetDB()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 type item struct {
 	Item_number int
@@ -20,7 +32,7 @@ type item struct {
 var item_list []item
 var max_item_id int
 
-func to_do(c echo.Context) error {
+func To_do(c echo.Context) error {
 	err := fetch_todo_db()
 	if err != nil {
 		return err
@@ -30,8 +42,9 @@ func to_do(c echo.Context) error {
 }
 
 func fetch_todo_db() error {
+	init_db()
 	item_list = nil
-	rows, query_err := db.Query("SELECT id, todo_content, datetime(date_created), is_done FROM todo;")
+	rows, query_err := Db.Query("SELECT id, todo_content, datetime(date_created), is_done FROM todo;")
 	if query_err != nil {
 		log.Print(query_err)
 		return query_err
@@ -43,7 +56,7 @@ func fetch_todo_db() error {
 		item_list = append(item_list, item)
 	}
 
-	query_err = db.QueryRow("select ifnull(max(id), 0) from todo;").Scan(&max_item_id)
+	query_err = Db.QueryRow("select ifnull(max(id), 0) from todo;").Scan(&max_item_id)
 	if query_err != nil {
 		return query_err
 	}
@@ -51,11 +64,11 @@ func fetch_todo_db() error {
 	return nil
 }
 
-func delete_item(c echo.Context) error {
+func Delete_item(c echo.Context) error {
 	id := c.Param("id")
 
 	query := fmt.Sprintf("DELETE FROM todo WHERE id=%s",id)
-	_,err := db.Exec(query)
+	_,err := Db.Exec(query)
 	if err != nil {
 		log.Print(err)
 		return err
@@ -64,7 +77,7 @@ func delete_item(c echo.Context) error {
 	return c.HTML(http.StatusOK, "item deleted")
 }
 
-func add_to_do(c echo.Context) error {
+func Add_to_do(c echo.Context) error {
 	var item_input string = c.FormValue("item_content")
 
 	max_item_id += 1
@@ -78,7 +91,7 @@ func add_to_do(c echo.Context) error {
 	i.Item_content, 
 	i.Date_created,)
 
-	_, err := db.Exec(query)
+	_, err := Db.Exec(query)
 	if err != nil {
 		return err
 	}

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	todo "learning/to-do/todo"
+	db "learning/to-do/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
@@ -25,7 +27,7 @@ func newTemplate() *Template {
 	}
 }
 
-var db *sql.DB
+var Db *sql.DB
 func main() {
 	var err error
 	e := echo.New()
@@ -38,9 +40,9 @@ func main() {
 	e.GET("/", func (c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
 	})
-	e.GET("/to-do", to_do)
-	e.DELETE("/to-do/:id", delete_item)
-	e.PUT("/add-to-do", add_to_do)
+	e.GET("/to-do", todo.To_do)
+	e.DELETE("/to-do/:id", todo.Delete_item)
+	e.PUT("/add-to-do", todo.Add_to_do)
 
 	// middleware
 
@@ -70,12 +72,12 @@ func main() {
 	}))
 
 
-	db, err = init_db()
+	Db, err = db.GetDB()
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
 
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
-	defer db.Close()
+	defer Db.Close()
 }

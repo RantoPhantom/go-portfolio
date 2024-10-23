@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -6,11 +6,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var db *sql.DB
 
-func init_db() (*sql.DB, error) {
+func Init_db() (*sql.DB, error) {
+
 	db, err := sql.Open("sqlite3", "db.sqlite")
 	if err != nil {
-		return nil, err
+		return db, err
 	}
 
 	pingErr := db.Ping()
@@ -24,5 +26,14 @@ func init_db() (*sql.DB, error) {
 		return nil, createErr
 	}
 
+	return db, nil
+}
+
+func GetDB() (*sql.DB, error) {
+	var err error
+	if db == nil{
+		db, err = Init_db()
+		if err != nil { return nil, err}
+	}
 	return db, nil
 }
