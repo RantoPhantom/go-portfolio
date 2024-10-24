@@ -9,6 +9,7 @@ import (
 
 	todo "learning/to-do/todo"
 	db "learning/to-do/db"
+	chat "learning/to-do/chat"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
@@ -43,6 +44,8 @@ func main() {
 	e.GET("/to-do", todo.To_do)
 	e.DELETE("/to-do/:id", todo.Delete_item)
 	e.PUT("/add-to-do", todo.Add_to_do)
+
+	e.GET("/chat", chat.Chat)
 
 	// middleware
 
