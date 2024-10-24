@@ -1,4 +1,4 @@
-module learning/to-do
+module learning/go-portfolio
 
 go 1.22.1
 

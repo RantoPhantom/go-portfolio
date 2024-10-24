@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	db "learning/to-do/db"
+	db "learning/go-portfolio/db"
 	"github.com/labstack/echo/v4"
 )
 

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	todo "learning/to-do/todo"
-	db "learning/to-do/db"
-	chat "learning/to-do/chat"
+	todo "learning/go-portfolio/todo"
+	db "learning/go-portfolio/db"
+	chat "learning/go-portfolio/chat"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
