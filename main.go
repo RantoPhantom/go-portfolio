@@ -6,10 +6,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
+	"log"
 
-	todo "learning/go-portfolio/todo"
-	db "learning/go-portfolio/db"
 	chat "learning/go-portfolio/chat"
+	db "learning/go-portfolio/db"
+	todo "learning/go-portfolio/todo"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
@@ -20,11 +24,29 @@ type Template struct {
 }
 
 func (t *Template) Render(writer io.Writer, name string, data interface{}, context echo.Context) error {
+	if !strings.Contains(name, ".html"){
+		name += ".html"
+	}
 	return t.templates.ExecuteTemplate(writer, name, data)
 }
+
 func newTemplate() *Template {
+	templates := template.New("")
+	err := filepath.Walk("./views", func(path string, info os.FileInfo, err error) error{
+		if strings.Contains(path, ".html"){
+			_, err := templates.ParseFiles(path)
+			if err != nil{
+				log.Println(err)
+			}
+		}
+		return err
+	})
+
+	if err != nil {
+		panic(err)
+	}
 	return &Template{
-		templates: template.Must(template.ParseGlob("./views/*.html")),
+		templates : templates,
 	}
 }
 
@@ -39,7 +61,7 @@ func main() {
 
 	// router
 	e.GET("/", func (c echo.Context) error {
-		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
+		return c.Redirect(http.StatusTemporaryRedirect, "/chat")
 	})
 	e.GET("/to-do", todo.To_do)
 	e.DELETE("/to-do/:id", todo.Delete_item)
