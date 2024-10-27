@@ -52,7 +52,6 @@ func newTemplate() *Template {
 
 var Db *sql.DB
 func main() {
-	var err error
 	e := echo.New()
 	e.Renderer = newTemplate()
 
@@ -97,12 +96,9 @@ func main() {
 	}))
 
 
-	Db, err = db.GetDB()
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
+	Db = db.GetDB()
+	defer Db.Close()
 
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
-	defer Db.Close()
 }

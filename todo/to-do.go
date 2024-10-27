@@ -11,13 +11,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var Db, err = db.GetDB()
+var Db = db.GetDB()
 func init_db() error {
 	if Db == nil{
-		Db, err = db.GetDB()
-		if err != nil {
-			return err
-		}
+		Db = db.GetDB()
 	}
 	return nil
 }
@@ -100,5 +97,5 @@ func Add_to_do(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(http.StatusOK, "form", item_list)
+	return c.Render(http.StatusOK, "form.html", item_list)
 }
