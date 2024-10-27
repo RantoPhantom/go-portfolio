@@ -82,13 +82,15 @@ func Add_to_do(c echo.Context) error {
 	i.Item_content = strings.TrimSpace(item_input)
 	i.Date_created = time.Now().Format(time.RFC3339)
 
-	query := fmt.Sprintf(`INSERT INTO todo (id, todo_content, date_created)
-	VALUES (%d, '%s', '%s');`,
-	i.Item_number, 
-	i.Item_content, 
-	i.Date_created,)
 
-	_, err := Db.Exec(query)
+	query := `INSERT INTO todo (id, todo_content, date_created)
+	VALUES (?,?,?);`
+	statement, err := Db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	_, err = statement.Exec(i.Item_number, i.Item_content, i.Date_created)
 	if err != nil {
 		return err
 	}
