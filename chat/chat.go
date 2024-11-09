@@ -8,3 +8,4 @@ import (
 func Chat(c echo.Context) error{
 	return c.Render(http.StatusOK, "chat", nil)
 }
+
