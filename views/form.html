@@ -1,18 +1,43 @@
 {{block "form" .}}
-<div class="item_list">
+<div id="item_list" class="flex flex-col justify-center mt-2 ;">
 	{{range $index, $val:= .}}
-	<ul class="item" id="item{{.Item_number}}">
-
-		<span class="item_id">
+	<ul class="
+		group
+		break-words 
+		w-2/5 
+		self-center 
+		bg-neutral-300
+		hover:bg-[#c1c1c1]
+		flex 
+		justify-between
+		items-center 
+		m-1
+		h-15
+		p-2.5 
+		rounded-[15px]
+		;" 
+		id="item{{.Item_number}}">
+		<div>
+			<p class="item_id">
 			{{.Item_content}}
-		</span>
-
-		<img class="delete_button"
-		hx-delete="/to-do/{{.Item_number}}"
-		hx-swap="delete"
-		hx-target="closest #item{{.Item_number}}"
-		src="./static/icons/delete_button.svg"
-		alt="delete item">
+			</p>
+		</div>
+		<div class="flex gap-0">
+			<img id="delete-button" class="
+			hidden
+			group-hover:block
+			basis-auto 
+			grow-0 
+			w-[4.25%] 
+			h-[4.25%] 
+			ml-auto
+			;"
+			hx-delete="/to-do/{{.Item_number}}"
+			hx-swap="delete"
+			hx-target="closest #item{{.Item_number}}"
+			src="./static/icons/delete_button.svg"
+			alt="delete item">
+		</div>
 	</ul>
 	{{end}}
 </div>

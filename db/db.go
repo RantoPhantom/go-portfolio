@@ -47,10 +47,10 @@ func init_tables() error {
 	}
 
 	//init the users table
-	create_query = `CREATE TABLE IF NOT EXISTS users (
-	id INTEGER NOT NULL,
-	name TEXT NOT NULL,
-	password TEXT NOT NULL,
+	create_query = `CREATE TABLE IF NOT EXISTS chat_users (
+	user_id INTEGER NOT NULL,
+	username TEXT NOT NULL,
+	password_hash TEXT NOT NULL,
 	date_created TEXT)
 	`
 	_,err = db.Exec(create_query)

@@ -1,13 +1,46 @@
 {{template "base.html"}}
 
-{{define "css"}}to_do.css{{end}}
 {{define "title"}}To Do list{{end}}
 
-<p id="title"><b>To-do list :D</b></p>
+<p id="title" class="
+text-[2em] 
+text-center 
+mt-[1.25em] 
+mb-[0.5em]
+;
+"><b>To-do list :D</b></p>
 
-<form class="form" autocomplete="off" hx-on::after-request="this.reset()">
-	<input id="item_input" type="text" name="item_content" placeholder="Add an item" required>
-	<button id="add_button" hx-put="/add-to-do" hx-target=".item_list" hx-swap="outerHTML" type="submit">
+<form class="flex justify-center" autocomplete="off" hx-on::after-request="this.reset()">
+	<input id="item_input" class="
+	w-[35%] 
+	bg-[lightgray] 
+	text-xl 
+	p-2.5 
+	rounded-[15px_0px_0px_15px] 
+	border-2
+	border-r-0
+	border-black
+	border-solid
+	;
+	"type="text" 
+	name="item_content" 
+	placeholder="Add an item" 
+	required>
+	<button id="add_button" class="flex-initial 
+		text-3xl 
+		text-[white] 
+		bg-[grey] 
+		px-2.5 
+		py-[5px] 
+		rounded-[0px_15px_15px_0px] 
+		border-2 
+		border-solid 
+		border-[black]
+		;" 
+		hx-put="/add-to-do" 
+		hx-target="#item_list" 
+		hx-swap="outerHTML" 
+		type="submit">
 		&#43;
 	</button>
 </form>

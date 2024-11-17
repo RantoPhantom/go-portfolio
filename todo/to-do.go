@@ -101,3 +101,7 @@ func Add_to_do(c echo.Context) error {
 	}
 	return c.Render(http.StatusOK, "form.html", item_list)
 }
+
+func Update_item(c echo.Context) error {
+	return c.Render(http.StatusOK, "form.html", item_list)
+}
