@@ -3,7 +3,6 @@
 	{{range $index, $val:= .}}
 	<ul class="
 		group
-		break-words 
 		w-2/5 
 		self-center 
 		bg-neutral-300
@@ -18,7 +17,7 @@
 		;" 
 		id="item{{.Item_number}}">
 		<div>
-			<p class="item_id">
+			<p class="whitespace-nowrap item_id">
 			{{.Item_content}}
 			</p>
 		</div>
@@ -26,8 +25,6 @@
 			<img id="delete-button" class="
 			hidden
 			group-hover:block
-			basis-auto 
-			grow-0 
 			w-[4.25%] 
 			h-[4.25%] 
 			ml-auto
