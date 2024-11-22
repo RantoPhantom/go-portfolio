@@ -76,6 +76,9 @@ func Delete_item(c echo.Context) error {
 
 func Add_to_do(c echo.Context) error {
 	var item_input string = c.FormValue("item_content")
+	if (item_input == ""){
+		return echo.NewHTTPError(http.StatusConflict, "Empty item content")
+	}
 
 	max_item_id += 1
 	i := item{Item_number: max_item_id}
