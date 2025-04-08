@@ -10,7 +10,6 @@ import (
 	"strings"
 	"log"
 
-	chat "learning/go-portfolio/chat"
 	db "learning/go-portfolio/db"
 	todo "learning/go-portfolio/todo"
 
@@ -60,16 +59,13 @@ func main() {
 
 	// router
 	e.GET("/", func (c echo.Context) error {
-		return c.Redirect(http.StatusTemporaryRedirect, "/chat")
+		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
 	})
 	e.GET("/to-do", todo.To_do)
 	e.DELETE("/to-do/:id", todo.Delete_item)
 	e.PUT("/add-to-do", todo.Add_to_do)
 
-	e.GET("/chat", chat.Chat)
-
 	// middleware
-
 	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogError: true,
