@@ -10,8 +10,8 @@ import (
 	"log"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/rs/zerolog"
+	middleware "learning/go-portfolio/middleware"
+	handlers "learning/go-portfolio/handlers"
 )
 
 type Template struct {
@@ -56,35 +56,12 @@ func main() {
 	e.GET("/", func (c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
 	})
-	e.GET("/to-do", todo)
-	e.DELETE("/to-do/:id", delete_item)
-	e.PUT("/add-to-do", add_to_do)
+	e.GET("/to-do", handlers.Todo)
+	e.DELETE("/to-do/:id", handlers.Delete_item)
+	e.PUT("/to-do/add-to-do", handlers.Add_to_do)
 
 	// middleware
-	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogError: true,
-		LogURI:    true,
-		LogStatus: true,
-		HandleError: true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			if v.Error == nil {
-				logger.Info().
-				Timestamp().
-				Str("URI", v.URI).
-				Int("status", v.Status).
-				Msg("request")
-			} else {
-				logger.Error().
-				Timestamp().
-				Err(v.Error).
-				Str("URI", v.URI).
-				Int("status", v.Status).
-				Msg("err:")
-			}
-			return nil
-		},
-	}))
+	middleware.SetupLogger(e)
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
 }
