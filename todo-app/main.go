@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"html/template"
 	"io"
 	"net/http"
@@ -9,9 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"log"
-
-	db "learning/go-portfolio/db"
-	todo "learning/go-portfolio/todo"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -49,7 +45,6 @@ func newTemplate() *Template {
 	}
 }
 
-var Db *sql.DB
 func main() {
 	e := echo.New()
 	e.Renderer = newTemplate()
@@ -61,9 +56,9 @@ func main() {
 	e.GET("/", func (c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, "/to-do")
 	})
-	e.GET("/to-do", todo.To_do)
-	e.DELETE("/to-do/:id", todo.Delete_item)
-	e.PUT("/add-to-do", todo.Add_to_do)
+	e.GET("/to-do", todo)
+	e.DELETE("/to-do/:id", delete_item)
+	e.PUT("/add-to-do", add_to_do)
 
 	// middleware
 	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
@@ -90,11 +85,6 @@ func main() {
 			return nil
 		},
 	}))
-
-
-	Db = db.GetDB()
-	defer Db.Close()
-
 	e.Debug = true
 	e.Logger.Fatal(e.Start(":6969"))
 }

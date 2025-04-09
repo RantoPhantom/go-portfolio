@@ -15,10 +15,10 @@
 		p-2.5 
 		rounded-[15px]
 		;" 
-		id="item{{.Item_number}}">
+		id="item{{.ItemNumber}}">
 		<div>
 			<p class="whitespace-nowrap item_id">
-			{{.Item_content}}
+			{{.Content}}
 			</p>
 		</div>
 		<div class="flex gap-0">
@@ -29,9 +29,9 @@
 			h-[4.25%] 
 			ml-auto
 			;"
-			hx-delete="/to-do/{{.Item_number}}"
+			hx-delete="/to-do/{{.ID}}"
 			hx-swap="delete"
-			hx-target="closest #item{{.Item_number}}"
+			hx-target="closest #item{{.ItemNumber}}"
 			src="./static/icons/delete_button.svg"
 			alt="delete item">
 		</div>
