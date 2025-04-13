@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS todo_items (
 	is_done BOOL DEFAULT FALSE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS user_info (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	password TEXT NOT NULL,
+	username TEXT NOT NULL,
+	password_hash TEXT NOT NULL,
 	date_created timestamp NOT NULL
 );
