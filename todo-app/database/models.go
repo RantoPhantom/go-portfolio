@@ -16,8 +16,7 @@ type TodoItem struct {
 	IsDone      bool
 }
 
-type User struct {
-	ID          int64
-	Password    string
-	DateCreated time.Time
+type UserInfo struct {
+	PasswordHash string
+	DateCreated  time.Time
 }

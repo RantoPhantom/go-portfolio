@@ -19,3 +19,10 @@ VALUES (?,?,?);
 
 -- name: Get_item_count :one
 SELECT CAST(IFNULL(MAX(id), 0) as INTEGER) as COUNT FROM todo_items;
+
+-- name: Get_password :one
+SELECT password_hash FROM user_info;
+
+-- name: Insert_user_info :exec
+insert into user_info(password_hash, date_created)
+values(?,?);

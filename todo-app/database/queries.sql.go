@@ -84,6 +84,32 @@ func (q *Queries) Get_item_count(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const get_password = `-- name: Get_password :one
+SELECT password_hash FROM user_info
+`
+
+func (q *Queries) Get_password(ctx context.Context) (string, error) {
+	row := q.db.QueryRowContext(ctx, get_password)
+	var password_hash string
+	err := row.Scan(&password_hash)
+	return password_hash, err
+}
+
+const insert_user_info = `-- name: Insert_user_info :exec
+insert into user_info(password_hash, date_created)
+values(?,?)
+`
+
+type Insert_user_infoParams struct {
+	PasswordHash string
+	DateCreated  time.Time
+}
+
+func (q *Queries) Insert_user_info(ctx context.Context, arg Insert_user_infoParams) error {
+	_, err := q.db.ExecContext(ctx, insert_user_info, arg.PasswordHash, arg.DateCreated)
+	return err
+}
+
 const update_item = `-- name: Update_item :exec
 UPDATE todo_items
 SET is_done = ?

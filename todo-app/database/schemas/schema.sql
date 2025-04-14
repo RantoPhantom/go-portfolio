@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS todo_items (
 );
 
 CREATE TABLE IF NOT EXISTS user_info (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	username TEXT NOT NULL,
 	password_hash TEXT NOT NULL,
 	date_created timestamp NOT NULL
 );
