@@ -1,16 +1,12 @@
-{{block "base".}}
+{{define "head"}}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{block "title" .}}you should not be able to see this{{end}}</title>
 		<script src="/static/scripts/htmx.min.js"></script>
 		<link rel="shortcut icon" href="/static/lisa-cool.png" type="image/x-icon">
 		<link rel="stylesheet" href="/static/styles/output.css">
 	</head>
-	{{block "custom" .}}{{end}}
-	<body>
-	</body>
 </html>
 {{end}}

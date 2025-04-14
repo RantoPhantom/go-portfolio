@@ -1,0 +1,8 @@
+{{template "base.html"}} 
+<form hx-post="./signup-request" hx-on:after-request="this.reset()">
+	<label for="username">Username:</label><br>
+	<input type="text" name="username" id="username"><br>
+	<label for="password">Password:</label><br>
+	<input type="text" name="password" id="password"><br>
+	<button type="submit">click me</button>
+</form>
