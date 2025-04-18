@@ -1,8 +1,65 @@
-{{template "base.html"}} 
-<form hx-post="./signup-request" hx-on:after-request="this.reset()">
-	<label for="username">Username:</label><br>
-	<input type="text" name="username" id="username"><br>
-	<label for="password">Password:</label><br>
-	<input type="text" name="password" id="password"><br>
-	<button type="submit">click me</button>
-</form>
+{{template "head"}} 
+<title>Register Page</title>
+
+<!-- the background and centering the content -->
+<style>
+body { 
+	background: linear-gradient(
+		rgba(0,0,0,0.5),
+		rgba(0,0,0,0.5)
+		), url('/static/images/auth-background.jpg'), no-repeat, center;
+	background-size: cover;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+}
+</style>
+
+<script>
+	function clearError() {
+		setTimeout(() => {
+			const element = document.querySelectorAll('.error');
+			element.forEach(el => {
+				el.textContent = '';
+			});
+		}, 1000);
+	}
+</script>
+
+<p class="text-white text-6xl pb-10">
+<i>Register Page</i>
+</p>
+<div class="bg-gray-300 bg-opacity-80 p-10 pt-8 w-2/5 pb-0">
+	<form method="POST" hx-post="./signup-request" hx-on:after-request="this.reset()">
+
+		<!-- Username Field -->
+		<div class="relative">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+				class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5">
+				<path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+			</svg>
+			<input pattern=".{5,30}" title="from 5 to 30 characters" autocomplete="username" type="text" name="username" id="username" placeholder="Username" required
+			class="pl-10 pr-4 py-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+		</div>
+		<p id="username_error" hx-on::after-settle="clearError()" class="error font-bold text-red-500 mb-4"></p>
+
+		<!-- Password Field -->
+		<div class="relative">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+				class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5">
+				<path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
+			</svg>
+			<input pattern=".{12,70}" title="from 12 to 70 characters" type="password" name="password" id="password" placeholder="Password" required
+			class="pl-10 pr-4 py-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+		</div>
+		<p id="password_error" hx-on::after-settle="clearError()" class="error font-bold text-red-500"></p>
+
+		<div class="mt-2 flex flex-row justify-between">
+			<a class="text-black" href ="./login">Already have an account?</a>
+		</div>
+		<button class="bg-cyan-300 rounded-md py-2 mb-8 my-4 w-full" type="submit">Register</button>
+	</form>
+</div>
+

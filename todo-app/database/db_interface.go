@@ -93,3 +93,10 @@ func CreateDB(username string, password string) error {
 
 	return nil
 }
+
+func CheckUserExists(username string) error {
+	if _,err := os.Stat(DB_PATH + username + ".sqlite"); err == nil {
+		return custom_errors.UserDbExists
+	}
+	return nil
+}

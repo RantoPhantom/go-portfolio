@@ -1,5 +1,6 @@
 {{template "head"}}
 
+
 <title>ᓀ‸ᓂ</title>
 
 <p id="title" class="text-[2em] text-center mt-[1.25em] mb-[0.5em]"><b>To-do list :D</b></p>
@@ -12,14 +13,15 @@
 		type="text" name="item_content" placeholder="Add an item" minlength="1" maxlength="55" required>
 		<!-- plus button -->
 		<button id="add_button"
-			clasr="flex-initial text-3xl text-[white] bg-[grey] px-2.5 py-[5px] rounded-[0px_15px_15px_0px] border-2 border-solid border-[black]"
+			class="flex-initial text-3xl text-[white] bg-[grey] px-2.5 py-[5px] rounded-[0px_15px_15px_0px] border-2 border-solid border-[black]"
 			hx-put="/to-do/add-to-do" hx-target="#item_list" hx-swap="outerHTML" type="submit">&#43;
 		</button>
 	</form>
 	<!-- the error block -->
-	<p id="error"
-	class="text-red-500 text-center"
-	hx-trigger="htmx:afterSettle delay:1s" hx-get="/test">
+	<p 
+	id="error"
+	class="error text-red-500 text-center"
+	hx-trigger="htmx:afterSettle delay:1s" hx-get="/null">
 	</p>
 
 </div>
