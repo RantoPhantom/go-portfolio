@@ -1,33 +1,6 @@
 {{template "head"}} 
 <title>Register Page</title>
-
-<!-- the background and centering the content -->
-<style>
-body { 
-	background: linear-gradient(
-		rgba(0,0,0,0.5),
-		rgba(0,0,0,0.5)
-		), url('/static/images/auth-background.jpg'), no-repeat, center;
-	background-size: cover;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
-}
-</style>
-
-<script>
-	function clearError() {
-		setTimeout(() => {
-			const element = document.querySelectorAll('.error');
-			element.forEach(el => {
-				el.textContent = '';
-			});
-		}, 1000);
-	}
-</script>
-
+{{template "auth_scripts"}}
 <p class="text-white text-6xl pb-10">
 <i>Register Page</i>
 </p>
@@ -51,7 +24,7 @@ body {
 				class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5">
 				<path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
 			</svg>
-			<input pattern=".{12,70}" title="from 12 to 70 characters" type="password" name="password" id="password" placeholder="Password" required
+			<input pattern=".{4,70}" title="from 4 to 70 characters" type="password" name="password" id="password" placeholder="Password" required
 			class="pl-10 pr-4 py-2 w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
 		</div>
 		<p id="password_error" hx-on::after-settle="clearError()" class="error font-bold text-red-500"></p>

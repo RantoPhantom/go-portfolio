@@ -1,0 +1,28 @@
+{{define "auth_scripts"}}
+<!-- the background and centering the content -->
+<style>
+body { 
+	background: linear-gradient(
+		rgba(0,0,0,0.5),
+		rgba(0,0,0,0.5)
+		), url('/static/images/auth-background.jpg'), no-repeat, center;
+	background-size: cover;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+}
+</style>
+
+<script>
+	function clearError() {
+		setTimeout(() => {
+			const element = document.querySelectorAll('.error');
+			element.forEach(el => {
+				el.textContent = '';
+			});
+		}, 1000);
+	}
+</script>
+{{end}}
