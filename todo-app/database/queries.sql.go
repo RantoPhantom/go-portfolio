@@ -136,18 +136,19 @@ func (q *Queries) Insert_item(ctx context.Context, arg Insert_itemParams) error 
 const insert_list = `-- name: Insert_list :one
 ;
 
-insert into lists(list_name, icon_color)
-values (?,?)
+insert into lists(list_name, icon_color, date_created)
+values (?,?,?)
 returning list_id
 `
 
 type Insert_listParams struct {
-	ListName  string
-	IconColor string
+	ListName    string
+	IconColor   string
+	DateCreated time.Time
 }
 
 func (q *Queries) Insert_list(ctx context.Context, arg Insert_listParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, insert_list, arg.ListName, arg.IconColor)
+	row := q.db.QueryRowContext(ctx, insert_list, arg.ListName, arg.IconColor, arg.DateCreated)
 	var list_id int64
 	err := row.Scan(&list_id)
 	return list_id, err

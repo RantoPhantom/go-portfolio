@@ -1,8 +1,50 @@
 {{block "list" .}}
-<p class="font-bold text-lg pb-2">Lists</p>
+<!-- Lists header with add button -->
+<div class="flex flex-row items-center justify-between mt-2 mb-2">
+    <p class="font-bold text-lg">Lists</p>
+    <button
+        class="w-6 h-6 flex mr-2 items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition cursor-pointer"
+        title="Add New List"
+        hx-get="/to-do/lists/new"
+        hx-target="body"
+        hx-swap="beforeend"
+    >
+        <span class="text-xl leading-none">+</span>
+    </button>
+</div>
+<hr />
 {{range .}}
-<a href="../lists/{{.ListID}}" class="pl-4 mb-2 flex flex-row items-center hover:bg-gray-300 transition-[0.25s]">
-    <div id="item-{{.ListName}}-icon" class="size-4 rounded-sm" style="background-color: {{.IconColor}};"></div>
-    <p class="font-medium pl-2">{{.ListName}}</p>
-</a>
+<div class="mt-4 group flex flex-row items-center hover:bg-gray-300 transition-[0.25s]">
+    <div id="item-{{.ListID}}-icon" class="size-4 rounded-sm" style="background-color: {{.IconColor}};"></div>
+    <a href="/to-do/lists/{{.ListID}}" class="flex-grow flex items-center pl-4">
+        <p class="font-medium pl-2">{{.ListName}}</p>
+    </a>
+    <img
+        class="ml-auto mr-2 w-6 h-6 object-contain cursor-pointer"
+        src="/static/icons/delete_button.svg"
+        alt="Delete"
+        data-list-id="{{.ListID}}"
+        hx-delete="/to-do/lists/{{.ListID}}"
+        hx-target="closest .group"
+        hx-swap="outerHTML"
+    />
+</div>
+<script>
+    // restrict deleting current list
+    document.addEventListener("htmx:afterSwap", function () {
+        const baseHref = document.querySelector("base")?.href || "";
+        const match = baseHref.match(/\/lists\/(\d+)\//);
+        if (!match) return;
+
+        const currentListId = match[1];
+
+        document.querySelectorAll(`[data-list-id="${currentListId}"]`).forEach((btn) => {
+            btn.removeAttribute("hx-delete");
+            btn.style.opacity = "0.5";
+            btn.style.pointerEvents = "none";
+            btn.title = "You cannot delete the current list";
+        });
+    });
+</script>
+
 {{end}} {{end}}

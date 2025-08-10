@@ -1,0 +1,73 @@
+{{ block "new_list" .}}
+<div id="listFormOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg w-96 p-6">
+        <h2 class="text-xl font-bold mb-4">Create New List</h2>
+
+        <form
+            hx-post="/to-do/lists/"
+            hx-target="#lists"
+            hx-swap="beforeend"
+            hx-on="htmx:afterOnLoad: this.closest('#listFormOverlay').remove()"
+        >
+            <label for="listName" class="block font-medium mb-1">List Name</label>
+            <input
+                type="text"
+                id="listName"
+                name="listName"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 mb-4"
+                placeholder="Enter list name"
+                required
+            />
+
+            <label for="iconColor" class="block font-medium mb-1">Icon Color</label>
+            <div class="flex items-center space-x-2 mb-4">
+                <input
+                    type="color"
+                    id="iconColor"
+                    name="iconColor"
+                    value="#4f46e5"
+                    class="w-12 h-8 border border-gray-300 rounded-md cursor-pointer"
+                />
+                <input
+                    type="text"
+                    id="iconColorText"
+                    value="#4f46e5"
+                    maxlength="7"
+                    pattern="^#([0-9A-Fa-f]{6})$"
+                    class="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm font-mono"
+                    title="Enter a hex color code, e.g. #ff0000"
+                    required
+                />
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button
+                    type="button"
+                    class="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300"
+                    onclick="this.closest('#listFormOverlay').remove()"
+                >
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
+                    Create
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const colorInput = document.getElementById("iconColor");
+    const textInput = document.getElementById("iconColorText");
+
+    colorInput.addEventListener("input", () => {
+        textInput.value = colorInput.value;
+    });
+
+    textInput.addEventListener("input", () => {
+        if (/^#[0-9A-Fa-f]{6}$/.test(textInput.value)) {
+            colorInput.value = textInput.value;
+        }
+    });
+</script>
+{{end}}

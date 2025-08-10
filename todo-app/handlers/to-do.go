@@ -12,11 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type TodoUIHydrate struct {
-	Items []database.TodoItem
-	List  database.List
-}
-
 func TodoRouter(e *echo.Echo) {
 	main_group := e.Group("/to-do")
 	main_group.Use(custom_middleware.AuthMiddleware)
@@ -24,7 +19,8 @@ func TodoRouter(e *echo.Echo) {
 	main_group.GET("/lists/", listUI)
 	main_group.GET("/lists/:list_id", todoUI)
 	main_group.DELETE("/lists/:list_id", delete_list)
-	main_group.POST("/lists/:list_id", add_list)
+	main_group.GET("/lists/new", add_list_ui)
+	main_group.POST("/lists/", add_list)
 	main_group.PATCH("/lists/:list_id", change_list_name)
 	main_group.PUT("/lists/:list_id/", add_to_do)
 	main_group.DELETE("/lists/:list_id/:item_id", delete_to_do)
@@ -43,8 +39,9 @@ func redirect_first_list(c echo.Context) error {
 
 	if len(lists) == 0 {
 		id, err := db.Queries.Insert_list(c.Request().Context(), database.Insert_listParams{
-			ListName:  "Default List",
-			IconColor: "ff00ff",
+			ListName:    "Today",
+			IconColor:   "#00ff00",
+			DateCreated: time.Now(),
 		})
 		if err != nil {
 			return err
@@ -66,6 +63,11 @@ func get_user_db(c echo.Context) (string, *database.UserDb, error) {
 		return "", nil, err
 	}
 	return username, db, nil
+}
+
+type TodoUIHydrate struct {
+	Items []database.TodoItem
+	List  database.List
 }
 
 func todoUI(c echo.Context) error {
@@ -108,8 +110,27 @@ func listUI(c echo.Context) error {
 	return c.Render(http.StatusOK, "list", lists)
 }
 
+func add_list_ui(c echo.Context) error {
+	return c.Render(http.StatusOK, "new_list", nil)
+}
+
 func add_list(c echo.Context) error {
-	return nil
+	list_name := c.FormValue("listName")
+	list_icon := c.FormValue("iconColor")
+	_, db, err := get_user_db(c)
+	if err != nil {
+		return err
+	}
+	id, err := db.Queries.Insert_list(c.Request().Context(), database.Insert_listParams{
+		ListName:    list_name,
+		IconColor:   list_icon,
+		DateCreated: time.Now(),
+	})
+	if err != nil {
+		return err
+	}
+	c.Response().Header().Add("HX-Redirect", fmt.Sprintf("/to-do/lists/%d", id))
+	return c.NoContent(http.StatusNoContent)
 }
 
 func change_list_name(c echo.Context) error {

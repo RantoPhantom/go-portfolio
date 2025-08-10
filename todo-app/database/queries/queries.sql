@@ -27,8 +27,8 @@ where list_id = ?
 ;
 
 -- name: Insert_list :one
-insert into lists(list_name, icon_color)
-values (?,?)
+insert into lists(list_name, icon_color, date_created)
+values (?,?,?)
 returning list_id;
 
 -- name: Remove_list :exec
