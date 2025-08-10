@@ -26,9 +26,10 @@ from lists
 where list_id = ?
 ;
 
--- name: Insert_list :exec
+-- name: Insert_list :one
 insert into lists(list_name, icon_color)
-values (?,?);
+values (?,?)
+returning list_id;
 
 -- name: Remove_list :exec
 delete from lists

@@ -133,11 +133,12 @@ func (q *Queries) Insert_item(ctx context.Context, arg Insert_itemParams) error 
 	return err
 }
 
-const insert_list = `-- name: Insert_list :exec
+const insert_list = `-- name: Insert_list :one
 ;
 
 insert into lists(list_name, icon_color)
 values (?,?)
+returning list_id
 `
 
 type Insert_listParams struct {
@@ -145,9 +146,11 @@ type Insert_listParams struct {
 	IconColor string
 }
 
-func (q *Queries) Insert_list(ctx context.Context, arg Insert_listParams) error {
-	_, err := q.db.ExecContext(ctx, insert_list, arg.ListName, arg.IconColor)
-	return err
+func (q *Queries) Insert_list(ctx context.Context, arg Insert_listParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insert_list, arg.ListName, arg.IconColor)
+	var list_id int64
+	err := row.Scan(&list_id)
+	return list_id, err
 }
 
 const insert_user_info = `-- name: Insert_user_info :exec
