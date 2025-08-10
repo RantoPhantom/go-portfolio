@@ -1,28 +1,52 @@
-{{template "head"}}
-
+{{block "to-do" .}} {{template "head"}} {{template "sidemenu"}}
 
 <title>ᓀ‸ᓂ</title>
+<base href="/to-do/lists/{{.List.ListID}}/">
 
-<p id="title" class="text-[2em] text-center mt-[1.25em] mb-[0.5em]"><b>To-do list :D</b></p>
+<body id="main" class="bg-slate-100 transition-[margin-left]">
+    <img
+        id="nav_button"
+        class="transition-[0.5s] absolute size-12 pt-4 ml-2"
+        hx-on:click="toggleNav()"
+        src="/static/icons/hamburger_menu.svg"
+        alt=""
+    />
+    <p id="list_name" class="text-[2em] text-center pt-4 mb-[0.5em]"><b>{{.List.ListName}}</b></p>
 
-<div class="flex-col">
-	<form class="flex justify-center" autocomplete="off" hx-on::after-request="this.reset()">
-		<!-- text field -->
-		<input id="item_input"
-		class="w-[35%] bg-[lightgray] text-xl p-2.5 rounded-[15px_0px_0px_15px] border-2 border-r-0 border-black border-solid"
-		type="text" name="item_content" placeholder="Add an item" minlength="1" maxlength="55" required>
-		<!-- plus button -->
-		<button id="add_button"
-			class="flex-initial text-3xl text-[white] bg-[grey] px-2.5 py-[5px] rounded-[0px_15px_15px_0px] border-2 border-solid border-[black]"
-			hx-put="/to-do/add-to-do" hx-target="#item_list" hx-swap="outerHTML" type="submit">&#43;
-		</button>
-	</form>
-	<!-- the error block -->
-	<p 
-	id="error"
-	class="error text-red-500 text-center"
-	hx-trigger="htmx:afterSettle delay:1s" hx-get="/null">
-	</p>
-
-</div>
-{{template "form" .}}
+    <div class="flex-col">
+        <form class="flex justify-center" autocomplete="off" hx-on::after-request="this.reset()">
+            <!-- text field -->
+            <input
+                id="item_input"
+                class="w-[35%] bg-[lightgray] text-xl p-2.5 rounded-[15px_0px_0px_15px] border-2 border-r-0 border-black border-solid"
+                type="text"
+                name="item_content"
+                placeholder="Add an item"
+                minlength="1"
+                maxlength="55"
+                required
+            />
+            <!-- plus button -->
+            <button
+                id="add_button"
+                class="flex-initial text-3xl text-[white] bg-[grey] px-2.5 py-[5px] rounded-[0px_15px_15px_0px] border-2 border-solid border-[black]"
+                hx-post="./{{.List.ListID}}"
+                hx-target="#item_list"
+                hx-swap="outerHTML"
+                type="submit"
+            >
+                &#43;
+            </button>
+        </form>
+        <!-- the error block -->
+        <p
+            id="input_error"
+            class="error h-[25px] text-red-500 text-center"
+            hx-trigger="htmx:afterSettle delay:1s"
+            hx-get="/null"
+        ></p>
+        <div id="item_list">{{template "form" .Items}}</div>
+    </div>
+    <div hx-get=""></div>
+</body>
+{{end}}

@@ -13,7 +13,6 @@ import (
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cookie, err := c.Cookie("username")
-		fmt.Println(cookie)
 		if cookie == nil {
 			return c.Redirect(http.StatusSeeOther,"/auth/login")
 		}

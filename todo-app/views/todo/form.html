@@ -1,42 +1,26 @@
 {{block "form" .}}
-<div id="item_list" class="flex flex-col justify-center mt-2 ;">
-	{{range $index, $val:= .}}
-	<ul class="
-		group
-		w-2/5
-		self-center 
-		bg-neutral-300
-		hover:bg-[#c1c1c1]
-		flex 
-		justify-between
-		items-center 
-		m-1
-		h-15
-		p-2.5 
-		rounded-[15px]
-		;" 
-		id="item{{.ItemNumber}}">
-		<div>
-			<p class="whitespace-nowrap flex-1 overflow-hidden item_id">
-			{{.Content}}
-			</p>
-		</div>
-		<div class="flex w-6 h-6 flex-shrink-0 gap-0">
-			<img id="delete-button" class="
-			hidden
-			group-hover:block
-			w-full 
-			h-full
-			object-contain
-			cursor-pointer
-			;"
-			hx-delete="/to-do/{{.ID}}"
-			hx-swap="delete"
-			hx-target="closest #item{{.ItemNumber}}"
-			src="/static/icons/delete_button.svg"
-			alt="delete item">
-		</div>
-	</ul>
-	{{end}}
+<div id="item_list" class="flex flex-col justify-center">
+    {{range $index, $val:= .}}
+    <div
+        class="group w-2/5 self-center bg-neutral-300 hover:bg-[#c1c1c1] flex justify-between items-center m-1 h-15 p-2.5 rounded-lg cursor-pointer"
+        id="item{{.ItemID}}"
+    >
+        <div>
+            <p class="whitespace-nowrap flex-1 overflow-hidden item_id">{{.Content}}</p>
+        </div>
+        <!-- delete button -->
+        <div class="flex w-6 h-6 flex-shrink-0 gap-0">
+            <img
+                id="delete-button"
+                class="hidden group-hover:block w-full h-full object-contain cursor-pointer"
+				hx-delete="./{{.ItemID}}"
+                hx-swap="delete"
+                hx-target="closest #item{{.ItemID}}"
+                src="/static/icons/delete_button.svg"
+                alt="delete item"
+            />
+        </div>
+    </div>
+    {{end}}
 </div>
 {{end}}

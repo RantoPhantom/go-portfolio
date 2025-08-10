@@ -10,42 +10,15 @@ import (
 	"time"
 )
 
-const add_item = `-- name: Add_item :exec
-INSERT INTO todo_items(
-	content,
-	item_number,
-	date_created
-)
-VALUES (?,?,?)
+const get_items = `-- name: Get_items :many
+select item_id, list_id, content, date_created, is_done
+from todo_items
+where list_id = ?
 `
 
-type Add_itemParams struct {
-	Content     string
-	ItemNumber  int64
-	DateCreated time.Time
-}
-
-func (q *Queries) Add_item(ctx context.Context, arg Add_itemParams) error {
-	_, err := q.db.ExecContext(ctx, add_item, arg.Content, arg.ItemNumber, arg.DateCreated)
-	return err
-}
-
-const delete_item = `-- name: Delete_item :exec
-DELETE FROM todo_items
-WHERE id = ?
-`
-
-func (q *Queries) Delete_item(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, delete_item, id)
-	return err
-}
-
-const get_all_items = `-- name: Get_all_items :many
-SELECT id, item_number, content, date_created, is_done FROM todo_items
-`
-
-func (q *Queries) Get_all_items(ctx context.Context) ([]TodoItem, error) {
-	rows, err := q.db.QueryContext(ctx, get_all_items)
+// -----items-------
+func (q *Queries) Get_items(ctx context.Context, listID int64) ([]TodoItem, error) {
+	rows, err := q.db.QueryContext(ctx, get_items, listID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +27,8 @@ func (q *Queries) Get_all_items(ctx context.Context) ([]TodoItem, error) {
 	for rows.Next() {
 		var i TodoItem
 		if err := rows.Scan(
-			&i.ID,
-			&i.ItemNumber,
+			&i.ItemID,
+			&i.ListID,
 			&i.Content,
 			&i.DateCreated,
 			&i.IsDone,
@@ -73,21 +46,68 @@ func (q *Queries) Get_all_items(ctx context.Context) ([]TodoItem, error) {
 	return items, nil
 }
 
-const get_item_count = `-- name: Get_item_count :one
-SELECT CAST(IFNULL(MAX(id), 0) as INTEGER) as COUNT FROM todo_items
+const get_list_info = `-- name: Get_list_info :one
+;
+
+select list_id, list_name, icon_color, date_created
+from lists
+where list_id = ?
 `
 
-func (q *Queries) Get_item_count(ctx context.Context) (int64, error) {
-	row := q.db.QueryRowContext(ctx, get_item_count)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
+func (q *Queries) Get_list_info(ctx context.Context, listID int64) (List, error) {
+	row := q.db.QueryRowContext(ctx, get_list_info, listID)
+	var i List
+	err := row.Scan(
+		&i.ListID,
+		&i.ListName,
+		&i.IconColor,
+		&i.DateCreated,
+	)
+	return i, err
+}
+
+const get_lists = `-- name: Get_lists :many
+;
+
+select list_id, list_name, icon_color, date_created
+from lists
+`
+
+// -----lists-------
+func (q *Queries) Get_lists(ctx context.Context) ([]List, error) {
+	rows, err := q.db.QueryContext(ctx, get_lists)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []List
+	for rows.Next() {
+		var i List
+		if err := rows.Scan(
+			&i.ListID,
+			&i.ListName,
+			&i.IconColor,
+			&i.DateCreated,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const get_password = `-- name: Get_password :one
-SELECT password_hash FROM user_info
+select password_hash
+from user_info
 `
 
+// ----user_info-----
 func (q *Queries) Get_password(ctx context.Context) (string, error) {
 	row := q.db.QueryRowContext(ctx, get_password)
 	var password_hash string
@@ -95,7 +115,44 @@ func (q *Queries) Get_password(ctx context.Context) (string, error) {
 	return password_hash, err
 }
 
+const insert_item = `-- name: Insert_item :exec
+;
+
+INSERT INTO todo_items(list_id, content, date_created)
+VALUES(?,?,?)
+`
+
+type Insert_itemParams struct {
+	ListID      int64
+	Content     string
+	DateCreated time.Time
+}
+
+func (q *Queries) Insert_item(ctx context.Context, arg Insert_itemParams) error {
+	_, err := q.db.ExecContext(ctx, insert_item, arg.ListID, arg.Content, arg.DateCreated)
+	return err
+}
+
+const insert_list = `-- name: Insert_list :exec
+;
+
+insert into lists(list_name, icon_color)
+values (?,?)
+`
+
+type Insert_listParams struct {
+	ListName  string
+	IconColor string
+}
+
+func (q *Queries) Insert_list(ctx context.Context, arg Insert_listParams) error {
+	_, err := q.db.ExecContext(ctx, insert_list, arg.ListName, arg.IconColor)
+	return err
+}
+
 const insert_user_info = `-- name: Insert_user_info :exec
+;
+
 insert into user_info(password_hash, date_created)
 values(?,?)
 `
@@ -110,12 +167,45 @@ func (q *Queries) Insert_user_info(ctx context.Context, arg Insert_user_infoPara
 	return err
 }
 
-const update_item = `-- name: Update_item :exec
-UPDATE todo_items
-SET is_done = ?
+const remove_item = `-- name: Remove_item :exec
+delete from todo_items
+where item_id = ? and list_id = ?
 `
 
-func (q *Queries) Update_item(ctx context.Context, isDone bool) error {
-	_, err := q.db.ExecContext(ctx, update_item, isDone)
+type Remove_itemParams struct {
+	ItemID int64
+	ListID int64
+}
+
+func (q *Queries) Remove_item(ctx context.Context, arg Remove_itemParams) error {
+	_, err := q.db.ExecContext(ctx, remove_item, arg.ItemID, arg.ListID)
+	return err
+}
+
+const remove_list = `-- name: Remove_list :exec
+delete from lists
+where list_id = ?
+`
+
+func (q *Queries) Remove_list(ctx context.Context, listID int64) error {
+	_, err := q.db.ExecContext(ctx, remove_list, listID)
+	return err
+}
+
+const rename_list = `-- name: Rename_list :exec
+;
+
+update lists
+set list_name=?
+where list_id=?
+`
+
+type Rename_listParams struct {
+	ListName string
+	ListID   int64
+}
+
+func (q *Queries) Rename_list(ctx context.Context, arg Rename_listParams) error {
+	_, err := q.db.ExecContext(ctx, rename_list, arg.ListName, arg.ListID)
 	return err
 }

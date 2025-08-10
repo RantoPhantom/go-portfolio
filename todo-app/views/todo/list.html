@@ -1,0 +1,8 @@
+{{block "list" .}}
+<p class="font-bold text-lg pb-2">Lists</p>
+{{range .}}
+<a href="../lists/{{.ListID}}" class="pl-4 mb-2 flex flex-row items-center hover:bg-gray-300 transition-[0.25s]">
+    <div id="item-{{.ListName}}-icon" class="size-4 rounded-sm" style="background-color: {{.IconColor}};"></div>
+    <p class="font-medium pl-2">{{.ListName}}</p>
+</a>
+{{end}} {{end}}

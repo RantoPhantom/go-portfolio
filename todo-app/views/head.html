@@ -1,22 +1,22 @@
 {{define "head"}}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="/static/scripts/htmx.min.js"></script>
-		<link rel="shortcut icon" href="/static/lisa-cool.png" type="image/x-icon">
-		<link rel="stylesheet" href="/static/styles/output.css">
-	</head>
-	<script>
-		htmx.on("htmx:beforeSwap", (e) => {
-			// Allow 422 and 400 responses to swap
-			// We treat these as form validation errors
-			if (e.detail.xhr.status === 422 || e.detail.xhr.status === 400) {
-				e.detail.shouldSwap = true;
-				e.detail.isError = false;
-			}
-		})
-	</script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="/static/scripts/htmx.min.js"></script>
+        <link rel="shortcut icon" href="/static/lisa-cool.png" type="image/x-icon" />
+        <link rel="stylesheet" href="/static/styles/output.css" />
+    </head>
+    <script>
+        htmx.on("htmx:beforeSwap", (e) => {
+            // Allow 422 and 400 responses to swap
+            // We treat these as form validation errors
+            if (e.detail.xhr.status === 422 || e.detail.xhr.status === 400 || e.detail.xhr.status === 204) {
+                e.detail.shouldSwap = true;
+                e.detail.isError = false;
+            }
+        });
+    </script>
 </html>
 {{end}}

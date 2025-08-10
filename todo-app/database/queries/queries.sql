@@ -1,28 +1,52 @@
--- name: Get_all_items :many
-SELECT * FROM todo_items;
+-- -----items-------
+-- name: Get_items :many
+select *
+from todo_items
+where list_id = ?
+;
 
--- name: Delete_item :exec
-DELETE FROM todo_items
-WHERE id = ?;
+-- name: Insert_item :exec
+INSERT INTO todo_items(list_id, content, date_created)
+VALUES(?,?,?);
 
--- name: Update_item :exec
-UPDATE todo_items
-SET is_done = ?;
+-- name: Remove_item :exec
+delete from todo_items
+where item_id = ? and list_id = ?
+;
 
--- name: Add_item :exec
-INSERT INTO todo_items(
-	content,
-	item_number,
-	date_created
-)
-VALUES (?,?,?);
+-- -----lists-------
+-- name: Get_lists :many
+select *
+from lists
+;
 
--- name: Get_item_count :one
-SELECT CAST(IFNULL(MAX(id), 0) as INTEGER) as COUNT FROM todo_items;
+-- name: Get_list_info :one
+select *
+from lists
+where list_id = ?
+;
 
+-- name: Insert_list :exec
+insert into lists(list_name, icon_color)
+values (?,?);
+
+-- name: Remove_list :exec
+delete from lists
+where list_id = ?
+;
+
+-- name: Rename_list :exec
+update lists
+set list_name=?
+where list_id=?;
+
+-- ----user_info-----
 -- name: Get_password :one
-SELECT password_hash FROM user_info;
+select password_hash
+from user_info
+;
 
 -- name: Insert_user_info :exec
 insert into user_info(password_hash, date_created)
 values(?,?);
+

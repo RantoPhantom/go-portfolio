@@ -47,3 +47,6 @@ runner = "green"
 [misc]
 # Delete tmp directory on exit
 clean_on_exit = true
+
+[env]
+CGO_ENABLED = "1"

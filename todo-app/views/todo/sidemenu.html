@@ -1,0 +1,36 @@
+{{template "head"}} {{define "sidemenu"}}
+
+<div
+    id="side_menu"
+    class="w-0 h-full rounded-xl bg-[#ffffff] shadow-lg fixed z-1 overflow-x-hidden transition-[1s] left-0 top-0;"
+>
+    <!-- Menu button and name -->
+    <div
+        class="border-b-2 py-2 px-2 flex flex-row justify-between align-center hover:bg-gray-300 transition-[0.5s]"
+        onclick="toggleNav()"
+    >
+        <h1 class="text-center align-middle font-bold text-4xl">Menu</h1>
+        <img class="size-12 items-center" src="/static/icons/hamburger_menu.svg" alt="Hamburger menu icon" />
+    </div>
+    <!-- lists -->
+    <div id="lists" class="pl-4" hx-get="../" hx-trigger="load once" hx-swap="innerHTML"></div>
+</div>
+
+<script>
+    let menu_state = false;
+    const expanded_size = "25%";
+
+    function toggleNav() {
+        let size = expanded_size;
+        let nav_button_vis = "none";
+        if (menu_state) {
+            size = "0px";
+            nav_button_vis = "inherit";
+        }
+        side_menu.style.width = size;
+        menu_state = !menu_state;
+        nav_button.style.display = nav_button_vis;
+        //document.getElementById("main").style.marginLeft = size;
+    }
+</script>
+{{end}}

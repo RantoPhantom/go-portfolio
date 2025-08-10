@@ -11,10 +11,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func AuthRouter(e *echo.Echo) {
+	auth_group := e.Group("/auth")
+	auth_group.GET("/login", LoginUI)
+	auth_group.GET("/signup", SignupUI)
+	auth_group.GET("/logout", Logout)
+	auth_group.POST("/login-request", Login)
+	auth_group.POST("/signup-request", Signup)
+}
 
 func LoginUI(c echo.Context) error {
 	return c.Render(http.StatusOK, "login.html", nil)
 }
+
 func SignupUI(c echo.Context) error {
 	return c.Render(http.StatusOK, "signup.html", nil)
 }
@@ -24,15 +33,19 @@ func Login(c echo.Context) error {
 	password := c.FormValue("password")
 
 	db, err := database.GetDB(username)
-	if errors.Is(err, custom_errors.UserNotFound){
+	if errors.Is(err, custom_errors.UserNotFound) {
 		c.Response().Header().Add("HX-Retarget", "#username_error")
 		c.Response().Header().Add("HX-Reswap", "innerHTML")
 		return c.HTML(http.StatusBadRequest, err.Error())
-	} else if err != nil { return err }
+	} else if err != nil {
+		return err
+	}
 
 	ctx := c.Request().Context()
 	password_hash, err := db.Queries.Get_password(ctx)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	if err := bcrypt.CompareHashAndPassword([]byte(password_hash), []byte(password)); err != nil {
 		c.Response().Header().Add("HX-Retarget", "#password_error")
 		c.Response().Header().Add("HX-Reswap", "innerHTML")
@@ -53,7 +66,9 @@ func Login(c echo.Context) error {
 
 func Logout(c echo.Context) error {
 	old_cookie, err := c.Cookie("username")
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	old_cookie.Value = "asdf"
 	old_cookie.Path = "/"
 	old_cookie.MaxAge = -1
@@ -66,7 +81,6 @@ func Signup(c echo.Context) error {
 	username := c.FormValue("username")
 	password := []byte(c.FormValue("password"))
 
-
 	// bcrypt only accepts 72 bytes and lower
 	if len(password) > 71 {
 		c.Response().Header().Add("HX-Retarget", "#password_error")
@@ -75,13 +89,15 @@ func Signup(c echo.Context) error {
 	}
 
 	err := database.CheckUserExists(username)
-	if errors.Is(err, custom_errors.UserDbExists){
+	if errors.Is(err, custom_errors.UserDbExists) {
 		c.Response().Header().Add("HX-Retarget", "#username_error")
 		c.Response().Header().Add("HX-Reswap", "innerHTML")
 		return c.HTML(http.StatusBadRequest, err.Error())
 	}
 	password_hash, err := bcrypt.GenerateFromPassword(password, 4)
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 
 	// create the db
 	err = database.CreateDB(username, string(password_hash))
@@ -89,7 +105,9 @@ func Signup(c echo.Context) error {
 		c.Response().Header().Add("HX-Retarget", "#username_error")
 		c.Response().Header().Add("HX-Reswap", "innerHTML")
 		return c.HTML(http.StatusBadRequest, err.Error())
-	} else if err != nil { return err }
+	} else if err != nil {
+		return err
+	}
 
 	c.Response().Header().Add("HX-Redirect", "./login")
 	return c.NoContent(http.StatusOK)

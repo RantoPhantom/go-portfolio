@@ -8,9 +8,16 @@ import (
 	"time"
 )
 
+type List struct {
+	ListID      int64
+	ListName    string
+	IconColor   string
+	DateCreated time.Time
+}
+
 type TodoItem struct {
-	ID          int64
-	ItemNumber  int64
+	ItemID      int64
+	ListID      int64
 	Content     string
 	DateCreated time.Time
 	IsDone      bool
