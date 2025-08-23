@@ -12,18 +12,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const ITEMS_PER_PAGE int = 13
+
 func TodoRouter(e *echo.Echo) {
 	main_group := e.Group("/to-do")
 	main_group.Use(custom_middleware.AuthMiddleware)
 	main_group.GET("/", redirect_first_list)
 	main_group.GET("/lists/", listUI)
-	main_group.GET("/lists/:list_id", todoUI)
-	main_group.DELETE("/lists/:list_id", delete_list)
-	main_group.GET("/lists/new", add_list_ui)
+	main_group.GET("/lists/:list_id/", todoUI)
+	main_group.POST("/lists/:list_id/", itemsUI)
+	main_group.DELETE("/lists/:list_id/", delete_list)
+	main_group.GET("/lists/new/", add_list_ui)
 	main_group.POST("/lists/", add_list)
-	main_group.PATCH("/lists/:list_id", change_list_name)
+	main_group.PATCH("/lists/:list_id/", change_list_name)
 	main_group.PUT("/lists/:list_id/", add_to_do)
-	main_group.DELETE("/lists/:list_id/:item_id", delete_to_do)
+	main_group.DELETE("/lists/:list_id/:item_id/", delete_to_do)
 }
 
 func redirect_first_list(c echo.Context) error {
@@ -46,10 +49,10 @@ func redirect_first_list(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("./lists/%d", id))
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("./lists/%d/", id))
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("./lists/%d", lists[0].ListID))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("./lists/%d/", lists[0].ListID))
 }
 
 func get_user_db(c echo.Context) (string, *database.UserDb, error) {
@@ -63,11 +66,6 @@ func get_user_db(c echo.Context) (string, *database.UserDb, error) {
 		return "", nil, err
 	}
 	return username, db, nil
-}
-
-type TodoUIHydrate struct {
-	Items []database.TodoItem
-	List  database.List
 }
 
 func todoUI(c echo.Context) error {
@@ -84,16 +82,45 @@ func todoUI(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	items, err := db.Queries.Get_items(c.Request().Context(), int64(list_id))
+	return c.Render(http.StatusOK, "to-do", list)
+}
+
+type ItemsUIHydrate struct {
+	Items     []database.TodoItem
+	Next_page int
+	Has_more  bool
+}
+
+func itemsUI(c echo.Context) error {
+	has_more := true
+	current_page_str := c.QueryParam("current_page")
+	list_id_str := c.Param("list_id")
+	list_id, err := strconv.Atoi(list_id_str)
+	if current_page_str == "" {
+		current_page_str = "0"
+	}
+	current_page, err := strconv.Atoi(current_page_str)
 	if err != nil {
 		return err
 	}
-
-	hydration := &TodoUIHydrate{
-		Items: items,
-		List:  list,
+	_, db, err := get_user_db(c)
+	if err != nil {
+		return err
 	}
-	return c.Render(http.StatusOK, "to-do", hydration)
+	items, err := db.Queries.Get_paginated_items(c.Request().Context(), database.Get_paginated_itemsParams{
+		ListID: int64(list_id),
+		Limit:  int64(ITEMS_PER_PAGE),
+		Offset: int64(ITEMS_PER_PAGE * current_page),
+	})
+	if len(items) < ITEMS_PER_PAGE {
+		has_more = false
+	}
+	var items_ui_hydrate *ItemsUIHydrate = &ItemsUIHydrate{
+		Items:     items,
+		Next_page: current_page + 1,
+		Has_more:  has_more,
+	}
+	return c.Render(http.StatusOK, "items", items_ui_hydrate)
 }
 
 func listUI(c echo.Context) error {
@@ -226,6 +253,5 @@ func add_to_do(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	items, err := db.Queries.Get_items(c.Request().Context(), int64(list_id))
-	return c.Render(http.StatusOK, "form", items)
+	return itemsUI(c)
 }

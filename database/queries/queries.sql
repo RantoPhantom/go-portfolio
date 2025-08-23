@@ -1,4 +1,13 @@
 -- -----items-------
+-- name: Get_paginated_items :many
+select *
+from todo_items
+where list_id = ?
+order by item_id asc
+limit ?
+offset ?
+;
+
 -- name: Get_items :many
 select *
 from todo_items

@@ -1,7 +1,7 @@
 {{block "to-do" .}} {{template "head"}} {{template "sidemenu"}}
 
 <title>ᓀ‸ᓂ</title>
-<base href="/to-do/lists/{{.List.ListID}}/" />
+<base href="/to-do/lists/{{.ListID}}/" />
 
 <body id="main" class="bg-slate-100 transition-[margin-left]">
     <img
@@ -11,7 +11,7 @@
         src="/static/icons/hamburger_menu.svg"
         alt=""
     />
-    <p id="list_name" class="text-[2em] text-center pt-4 mb-[0.5em]"><b>{{.List.ListName}}</b></p>
+    <p id="list_name" class="text-[2em] text-center pt-4 mb-[0.5em]"><b>{{.ListName}}</b></p>
 
     <div class="flex-col">
         <form class="flex justify-center" autocomplete="off" hx-on::after-request="this.reset()">
@@ -45,8 +45,8 @@
             hx-trigger="htmx:afterSettle delay:1s"
             hx-get="/null"
         ></p>
-        <div id="item_list">{{template "form" .Items}}</div>
+        <!-- get the items once -->
+        <div hx-trigger="load once" hx-post="./"></div>
     </div>
-    <div hx-get=""></div>
 </body>
 {{end}}

@@ -11,12 +11,13 @@ import (
 )
 
 const get_items = `-- name: Get_items :many
+;
+
 select item_id, list_id, content, date_created, is_done
 from todo_items
 where list_id = ?
 `
 
-// -----items-------
 func (q *Queries) Get_items(ctx context.Context, listID int64) ([]TodoItem, error) {
 	rows, err := q.db.QueryContext(ctx, get_items, listID)
 	if err != nil {
@@ -88,6 +89,51 @@ func (q *Queries) Get_lists(ctx context.Context) ([]List, error) {
 			&i.ListName,
 			&i.IconColor,
 			&i.DateCreated,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const get_paginated_items = `-- name: Get_paginated_items :many
+select item_id, list_id, content, date_created, is_done
+from todo_items
+where list_id = ?
+order by item_id asc
+limit ?
+offset ?
+`
+
+type Get_paginated_itemsParams struct {
+	ListID int64
+	Limit  int64
+	Offset int64
+}
+
+// -----items-------
+func (q *Queries) Get_paginated_items(ctx context.Context, arg Get_paginated_itemsParams) ([]TodoItem, error) {
+	rows, err := q.db.QueryContext(ctx, get_paginated_items, arg.ListID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TodoItem
+	for rows.Next() {
+		var i TodoItem
+		if err := rows.Scan(
+			&i.ItemID,
+			&i.ListID,
+			&i.Content,
+			&i.DateCreated,
+			&i.IsDone,
 		); err != nil {
 			return nil, err
 		}

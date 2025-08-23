@@ -1,6 +1,6 @@
-{{block "form" .}}
+{{block "items" .}}
 <div id="item_list" class="flex flex-col justify-center">
-    {{range $index, $val:= .}}
+    {{range .Items}}
     <div
         class="group w-2/5 self-center bg-neutral-300 hover:bg-[#c1c1c1] flex justify-between items-center m-1 h-15 p-2.5 rounded-lg cursor-pointer"
         id="item{{.ItemID}}"
@@ -13,7 +13,7 @@
             <img
                 id="delete-button"
                 class="hidden group-hover:block w-full h-full object-contain cursor-pointer"
-                hx-delete="./{{.ItemID}}"
+                hx-delete="./{{.ItemID}}/"
                 hx-swap="delete"
                 hx-target="closest #item{{.ItemID}}"
                 src="/static/icons/delete_button.svg"
@@ -21,6 +21,8 @@
             />
         </div>
     </div>
+    {{end}} {{if eq .Has_more true}}
+    <div hx-post="./?current_page={{.Next_page}}" hx-trigger="revealed once"></div>
     {{end}}
 </div>
 {{end}}
