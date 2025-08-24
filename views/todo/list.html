@@ -5,7 +5,7 @@
     <button
         class="w-6 h-6 flex mr-2 items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition cursor-pointer"
         title="Add New List"
-        hx-get="/to-do/lists/new"
+        hx-get="/to-do/lists/new/"
         hx-target="body"
         hx-swap="beforeend"
     >
@@ -16,7 +16,7 @@
 {{range .}}
 <div class="mt-4 group flex flex-row items-center hover:bg-gray-300 transition-[0.25s]">
     <div id="item-{{.ListID}}-icon" class="size-4 rounded-sm" style="background-color: {{.IconColor}};"></div>
-    <a href="/to-do/lists/{{.ListID}}" class="flex-grow flex items-center pl-4">
+    <a href="/to-do/lists/{{.ListID}}/" class="flex-grow flex items-center pl-4">
         <p class="font-medium pl-2">{{.ListName}}</p>
     </a>
     <img
@@ -24,7 +24,7 @@
         src="/static/icons/delete_button.svg"
         alt="Delete"
         data-list-id="{{.ListID}}"
-        hx-delete="/to-do/lists/{{.ListID}}"
+        hx-delete="/to-do/lists/{{.ListID}}/"
         hx-target="closest .group"
         hx-swap="outerHTML"
     />

@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const ITEMS_PER_PAGE int = 13
+const ITEMS_PER_PAGE int = 3
 
 func TodoRouter(e *echo.Echo) {
 	main_group := e.Group("/to-do")
@@ -156,7 +156,7 @@ func add_list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	c.Response().Header().Add("HX-Redirect", fmt.Sprintf("/to-do/lists/%d", id))
+	c.Response().Header().Add("HX-Redirect", fmt.Sprintf("/to-do/lists/%d/", id))
 	return c.NoContent(http.StatusNoContent)
 }
 
