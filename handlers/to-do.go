@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const ITEMS_PER_PAGE int = 3
+const ITEMS_PER_PAGE int = 15
 
 func TodoRouter(e *echo.Echo) {
 	main_group := e.Group("/to-do")
@@ -120,6 +120,7 @@ func itemsUI(c echo.Context) error {
 		Next_page: current_page + 1,
 		Has_more:  has_more,
 	}
+	fmt.Println(has_more)
 	return c.Render(http.StatusOK, "items", items_ui_hydrate)
 }
 

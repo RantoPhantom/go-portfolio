@@ -13,6 +13,7 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
+	// _ "modernc.org/sqlite"
 )
 
 const DB_PATH = "./dbs/"

@@ -22,7 +22,7 @@
         </div>
     </div>
     {{end}} {{if eq .Has_more true}}
-    <div hx-post="./?current_page={{.Next_page}}" hx-trigger="revealed once"></div>
+    <div hx-post="./?current_page={{.Next_page}}" hx-trigger="intersect once"></div>
     {{end}}
 </div>
 {{end}}
