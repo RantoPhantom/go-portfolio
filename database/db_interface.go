@@ -8,7 +8,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"io/fs"
-	"learning/go-portfolio/custom_errors"
+	custom_errors "learning/go-portfolio/custom_errors"
+	utils "learning/go-portfolio/utils"
 	"os"
 	"regexp"
 	"sync"
@@ -18,12 +19,6 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	// _ "modernc.org/sqlite"
-)
-
-const (
-	DB_PATH             = "./dbs/"
-	SESSIONS_DB_PATH    = DB_PATH + "sessions.sqlite"
-	TOKEN_EXPIRATION_HR = 2
 )
 
 type DB_Connection struct {
@@ -47,7 +42,7 @@ var session_db_ddl string
 
 func CreateSessionDB() error {
 	ctx := context.Background()
-	db, err := sql.Open("sqlite3", SESSIONS_DB_PATH)
+	db, err := sql.Open("sqlite3", utils.AppConfig.DB_PATH + utils.AppConfig.SESSIONS_DB_NAME)
 	if err != nil {
 		return err
 	}
@@ -112,7 +107,7 @@ func GetDB(username string) (*DB_Connection, error) {
 	}
 
 	// check if the user is in db dir
-	var user_db_path string = DB_PATH + username + ".sqlite"
+	var user_db_path string = utils.AppConfig.DB_PATH + username + ".sqlite"
 	if _, err := os.Stat(user_db_path); errors.Is(err, fs.ErrNotExist) {
 		return nil, custom_errors.UserNotFound
 	}
@@ -155,10 +150,14 @@ func CreateSession(ctx context.Context, username string) (*Session, error) {
 	if err != nil {
 		return nil, err
 	}
+	token_expiration_hr, err := time.ParseDuration(utils.AppConfig.TOKEN_EXPIRATION)
+	if err != nil {
+		return nil, err
+	}
 	session, err := session_db_connection.Queries.Insert_session(ctx, Insert_sessionParams{
 		Username:    username,
 		Token:       token,
-		ExpiresAt:   time.Now().Add(TOKEN_EXPIRATION_HR * time.Hour),
+		ExpiresAt:   time.Now().Add(token_expiration_hr * time.Hour),
 		DateCreated: time.Now(),
 	})
 	if err != nil {
@@ -169,14 +168,14 @@ func CreateSession(ctx context.Context, username string) (*Session, error) {
 
 func CreateDB(ctx context.Context, username string, password string) error {
 	// check if main db dir exists, if not create it
-	if _, err := os.Stat(DB_PATH); errors.Is(err, fs.ErrNotExist) {
-		os.Mkdir(DB_PATH, os.ModePerm)
+	if _, err := os.Stat(utils.AppConfig.DB_PATH); errors.Is(err, fs.ErrNotExist) {
+		os.Mkdir(utils.AppConfig.DB_PATH, os.ModePerm)
 	}
 
 	if is_valid_username(username) {
 		return custom_errors.InvalidUsername
 	}
-	var user_db_path string = DB_PATH + username + ".sqlite"
+	var user_db_path string = utils.AppConfig.DB_PATH + username + ".sqlite"
 
 	db, err := sql.Open("sqlite3", user_db_path)
 	if err != nil {
@@ -205,7 +204,7 @@ func CreateDB(ctx context.Context, username string, password string) error {
 }
 
 func CheckUserExists(username string) error {
-	if _, err := os.Stat(DB_PATH + username + ".sqlite"); err == nil {
+	if _, err := os.Stat(utils.AppConfig.DB_PATH + username + ".sqlite"); err == nil {
 		return custom_errors.UserDbExists
 	}
 	return nil

@@ -4,13 +4,12 @@ import (
 	"errors"
 	"learning/go-portfolio/custom_errors"
 	"learning/go-portfolio/database"
+	utils "learning/go-portfolio/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
-
-const COOKIE_NAME string = "session_token"
 
 func AuthRouter(e *echo.Echo) {
 	auth_group := e.Group("/auth")
@@ -56,7 +55,7 @@ func Login(c echo.Context) error {
 	session, err := database.CreateSession(ctx, username)
 
 	cookie := new(http.Cookie)
-	cookie.Name = COOKIE_NAME
+	cookie.Name = utils.AppConfig.SESSION_COOKIE_NAME
 	cookie.Value = session.Token
 	cookie.Path = "/"
 	cookie.Expires = session.ExpiresAt
@@ -69,7 +68,7 @@ func Login(c echo.Context) error {
 }
 
 func Logout(c echo.Context) error {
-	old_cookie, err := c.Cookie(COOKIE_NAME)
+	old_cookie, err := c.Cookie(utils.AppConfig.SESSION_COOKIE_NAME)
 	if err != nil {
 		return err
 	}

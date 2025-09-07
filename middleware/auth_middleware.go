@@ -8,11 +8,12 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	utils "learning/go-portfolio/utils"
 )
 
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cookie, err := c.Cookie("session_token")
+		cookie, err := c.Cookie(utils.AppConfig.SESSION_COOKIE_NAME)
 		if cookie == nil {
 			return c.Redirect(http.StatusSeeOther, "/auth/login")
 		}

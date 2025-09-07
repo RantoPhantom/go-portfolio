@@ -4,16 +4,22 @@ import (
 	database "learning/go-portfolio/database"
 	handlers "learning/go-portfolio/handlers"
 	custom_middleware "learning/go-portfolio/middleware"
+	utils "learning/go-portfolio/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
+	var err error
+
 	defer database.CloseSessionDb()
+
+	utils.LoadConfig("./.env.local")
+
 	e := echo.New()
-	e.Renderer = newTemplate()
-	err := database.CreateSessionDB()
+	e.Renderer = utils.NewTemplate()
+	err = database.CreateSessionDB()
 	if err != nil {
 		panic(err)
 	}

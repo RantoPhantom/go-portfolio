@@ -10,9 +10,8 @@ import (
 	custom_middleware "learning/go-portfolio/middleware"
 
 	"github.com/labstack/echo/v4"
+	utils "learning/go-portfolio/utils"
 )
-
-const ITEMS_PER_PAGE int = 15
 
 func TodoRouter(e *echo.Echo) {
 	main_group := e.Group("/to-do")
@@ -56,7 +55,7 @@ func redirect_first_list(c echo.Context) error {
 }
 
 func user_retrieval_helper(c echo.Context) (*database.DB_Connection, error) {
-	cookie, err := c.Cookie("session_token")
+	cookie, err := c.Cookie(utils.AppConfig.SESSION_COOKIE_NAME)
 	if err != nil {
 		return nil, err
 	}
@@ -113,12 +112,17 @@ func itemsUI(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	items_per_page, err := strconv.Atoi(utils.AppConfig.ITEMS_PER_PAGE)
+	if err != nil {
+		return err
+	}
+
 	items, err := db.Queries.Get_paginated_items(c.Request().Context(), database.Get_paginated_itemsParams{
 		ListID: int64(list_id),
-		Limit:  int64(ITEMS_PER_PAGE),
-		Offset: int64(ITEMS_PER_PAGE * current_page),
+		Limit:  int64(items_per_page),
+		Offset: int64(items_per_page * current_page),
 	})
-	if len(items) < ITEMS_PER_PAGE {
+	if len(items) < items_per_page {
 		has_more = false
 	}
 	var items_ui_hydrate *ItemsUIHydrate = &ItemsUIHydrate{
