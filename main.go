@@ -13,8 +13,6 @@ import (
 func main() {
 	var err error
 
-	defer database.CloseSessionDb()
-
 	utils.LoadConfig("./.env.local")
 
 	e := echo.New()
@@ -23,6 +21,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer database.CloseSessionDb()
 
 	// set the static folder
 	e.Static("/static", "static")
