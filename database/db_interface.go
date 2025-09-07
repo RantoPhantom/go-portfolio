@@ -14,13 +14,15 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	_ "github.com/mattn/go-sqlite3"
 	// _ "modernc.org/sqlite"
 )
 
 const (
 	DB_PATH             = "./dbs/"
-	SESSIONS_DB_PATH    = DB_PATH + "sessions.db"
+	SESSIONS_DB_PATH    = DB_PATH + "sessions.sqlite"
 	TOKEN_EXPIRATION_HR = 2
 )
 
@@ -92,7 +94,7 @@ func GetSessionFromToken(ctx context.Context, session_token string) (*Session, e
 
 var banned_regex *regexp.Regexp = regexp.MustCompile(`[^a-zA-Z0-9_-]`)
 
-func is_username_banned(username string) bool {
+func is_valid_username(username string) bool {
 	return banned_regex.Match([]byte(username))
 }
 
@@ -171,7 +173,7 @@ func CreateDB(ctx context.Context, username string, password string) error {
 		os.Mkdir(DB_PATH, os.ModePerm)
 	}
 
-	if is_username_banned(username) {
+	if is_valid_username(username) {
 		return custom_errors.InvalidUsername
 	}
 	var user_db_path string = DB_PATH + username + ".sqlite"
@@ -185,9 +187,14 @@ func CreateDB(ctx context.Context, username string, password string) error {
 		return err
 	}
 
+	password_hash, err := bcrypt.GenerateFromPassword([]byte(password), 4)
+	if err != nil {
+		return err
+	}
+
 	queries := New(db)
 	err = queries.Insert_user_info(ctx, Insert_user_infoParams{
-		PasswordHash: password,
+		PasswordHash: string(password_hash),
 		DateCreated:  time.Now(),
 	})
 	if err != nil {

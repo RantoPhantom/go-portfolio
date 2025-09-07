@@ -126,7 +126,6 @@ func itemsUI(c echo.Context) error {
 		Next_page: current_page + 1,
 		Has_more:  has_more,
 	}
-	fmt.Println(has_more)
 	return c.Render(http.StatusOK, "items", items_ui_hydrate)
 }
 

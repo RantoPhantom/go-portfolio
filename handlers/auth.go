@@ -87,7 +87,7 @@ func Logout(c echo.Context) error {
 
 func Signup(c echo.Context) error {
 	username := c.FormValue("username")
-	password := []byte(c.FormValue("password"))
+	password := c.FormValue("password")
 
 	// bcrypt only accepts 72 bytes and lower
 	if len(password) > 71 {
@@ -102,13 +102,9 @@ func Signup(c echo.Context) error {
 		c.Response().Header().Add("HX-Reswap", "innerHTML")
 		return c.HTML(http.StatusBadRequest, err.Error())
 	}
-	password_hash, err := bcrypt.GenerateFromPassword(password, 4)
-	if err != nil {
-		return err
-	}
 
 	// create the db
-	err = database.CreateDB(c.Request().Context(), username, string(password_hash))
+	err = database.CreateDB(c.Request().Context(), username, password)
 	if errors.Is(err, custom_errors.InvalidUsername) {
 		c.Response().Header().Add("HX-Retarget", "#username_error")
 		c.Response().Header().Add("HX-Reswap", "innerHTML")
