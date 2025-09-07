@@ -1,6 +1,7 @@
 package main
 
 import (
+	database "learning/go-portfolio/database"
 	handlers "learning/go-portfolio/handlers"
 	custom_middleware "learning/go-portfolio/middleware"
 	"net/http"
@@ -9,8 +10,13 @@ import (
 )
 
 func main() {
+	defer database.CloseSessionDb()
 	e := echo.New()
 	e.Renderer = newTemplate()
+	err := database.CreateSessionDB()
+	if err != nil {
+		panic(err)
+	}
 
 	// set the static folder
 	e.Static("/static", "static")

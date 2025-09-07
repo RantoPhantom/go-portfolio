@@ -30,7 +30,7 @@ func TodoRouter(e *echo.Echo) {
 }
 
 func redirect_first_list(c echo.Context) error {
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -55,17 +55,23 @@ func redirect_first_list(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("./lists/%d/", lists[0].ListID))
 }
 
-func get_user_db(c echo.Context) (string, *database.UserDb, error) {
-	cookie, err := c.Cookie("username")
+func user_retrieval_helper(c echo.Context) (*database.DB_Connection, error) {
+	cookie, err := c.Cookie("session_token")
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
-	username := cookie.Value
-	db, err := database.GetDB(username)
+	token := cookie.Value
+	session, err := database.GetSessionFromToken(c.Request().Context(), token)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
-	return username, db, nil
+
+	db, err := database.GetDB(session.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
 
 func todoUI(c echo.Context) error {
@@ -74,7 +80,7 @@ func todoUI(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -103,7 +109,7 @@ func itemsUI(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -125,7 +131,7 @@ func itemsUI(c echo.Context) error {
 }
 
 func listUI(c echo.Context) error {
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -145,7 +151,7 @@ func add_list_ui(c echo.Context) error {
 func add_list(c echo.Context) error {
 	list_name := c.FormValue("listName")
 	list_icon := c.FormValue("iconColor")
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -169,7 +175,7 @@ func change_list_name(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -192,7 +198,7 @@ func delete_to_do(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -214,7 +220,7 @@ func delete_list(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}
@@ -239,7 +245,7 @@ func add_to_do(c echo.Context) error {
 		return err
 	}
 
-	_, db, err := get_user_db(c)
+	db, err := user_retrieval_helper(c)
 	if err != nil {
 		return err
 	}

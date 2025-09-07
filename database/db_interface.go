@@ -2,8 +2,10 @@ package database
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	_ "embed"
+	"encoding/hex"
 	"errors"
 	"io/fs"
 	"learning/go-portfolio/custom_errors"
@@ -16,22 +18,77 @@ import (
 	// _ "modernc.org/sqlite"
 )
 
-const DB_PATH = "./dbs/"
+const (
+	DB_PATH             = "./dbs/"
+	SESSIONS_DB_PATH    = DB_PATH + "sessions.db"
+	TOKEN_EXPIRATION_HR = 2
+)
 
-type UserDb struct {
+type DB_Connection struct {
 	Db      *sql.DB
 	Queries *Queries
 }
 
 var (
-	db_connections = make(map[string]*UserDb)
-	db_mutex       sync.Mutex
+	db_connections        = make(map[string]*DB_Connection)
+	db_mutex              sync.Mutex
+	session_db_connection *DB_Connection
 )
 
-// load the schemas into this variable
-//
-//go:embed schemas/*.sql
-var ddl string
+// load the schemas into variables
+
+//go:embed schemas/user_db.sql
+var user_db_ddl string
+
+//go:embed schemas/sessions_db.sql
+var session_db_ddl string
+
+func CreateSessionDB() error {
+	ctx := context.Background()
+	db, err := sql.Open("sqlite3", SESSIONS_DB_PATH)
+	if err != nil {
+		return err
+	}
+
+	if _, err := db.ExecContext(ctx, session_db_ddl); err != nil {
+		return err
+	}
+
+	queries := New(db)
+	session_db_connection = &DB_Connection{
+		Db:      db,
+		Queries: queries,
+	}
+	return nil
+}
+
+// checks if the session is expired in the db and retrive the session if not
+// Errors:
+// - SessionExpired - the session has been expired
+func CloseSessionDb() {
+	session_db_connection.Db.Close()
+}
+
+func GetSessionFromToken(ctx context.Context, session_token string) (*Session, error) {
+	if session_db_connection == nil {
+		return nil, custom_errors.SessionDbNotInitialized
+	}
+	queries := session_db_connection.Queries
+
+	session, err := queries.Get_session(ctx, session_token)
+	if err != nil {
+		return nil, err
+	}
+
+	if time.Now().After(session.ExpiresAt) {
+		err = queries.Remove_session(ctx, session_token)
+		if err != nil {
+			return nil, err
+		}
+		return nil, custom_errors.SessionExpired
+	}
+	return &session, nil
+}
 
 var banned_regex *regexp.Regexp = regexp.MustCompile(`[^a-zA-Z0-9_-]`)
 
@@ -39,7 +96,11 @@ func is_username_banned(username string) bool {
 	return banned_regex.Match([]byte(username))
 }
 
-func GetDB(username string) (*UserDb, error) {
+// returns the user_db object from uuid
+// Errors:
+// UserNotFound - uuid not found in fs
+// sql db errors
+func GetDB(username string) (*DB_Connection, error) {
 	db_mutex.Lock()
 	defer db_mutex.Unlock()
 
@@ -60,7 +121,7 @@ func GetDB(username string) (*UserDb, error) {
 	}
 
 	queries := New(db)
-	user_db := &UserDb{
+	user_db := &DB_Connection{
 		Db:      db,
 		Queries: queries,
 	}
@@ -70,7 +131,41 @@ func GetDB(username string) (*UserDb, error) {
 	return db_connections[username], nil
 }
 
-func CreateDB(username string, password string) error {
+// makes a random 256 bit opaque token
+func generate_session_token() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
+
+func Remove_Session(ctx context.Context, session_token string) error {
+	err := session_db_connection.Queries.Remove_session(ctx, session_token)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreateSession(ctx context.Context, username string) (*Session, error) {
+	token, err := generate_session_token()
+	if err != nil {
+		return nil, err
+	}
+	session, err := session_db_connection.Queries.Insert_session(ctx, Insert_sessionParams{
+		Username:    username,
+		Token:       token,
+		ExpiresAt:   time.Now().Add(TOKEN_EXPIRATION_HR * time.Hour),
+		DateCreated: time.Now(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &session, nil
+}
+
+func CreateDB(ctx context.Context, username string, password string) error {
 	// check if main db dir exists, if not create it
 	if _, err := os.Stat(DB_PATH); errors.Is(err, fs.ErrNotExist) {
 		os.Mkdir(DB_PATH, os.ModePerm)
@@ -81,13 +176,12 @@ func CreateDB(username string, password string) error {
 	}
 	var user_db_path string = DB_PATH + username + ".sqlite"
 
-	ctx := context.Background()
 	db, err := sql.Open("sqlite3", user_db_path)
 	if err != nil {
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, ddl); err != nil {
+	if _, err := db.ExecContext(ctx, user_db_ddl); err != nil {
 		return err
 	}
 

@@ -1,26 +1,26 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"learning/go-portfolio/custom_errors"
 	"learning/go-portfolio/database"
 	"net/http"
-	"errors"
 
 	"github.com/labstack/echo/v4"
 )
 
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cookie, err := c.Cookie("username")
+		cookie, err := c.Cookie("session_token")
 		if cookie == nil {
-			return c.Redirect(http.StatusSeeOther,"/auth/login")
+			return c.Redirect(http.StatusSeeOther, "/auth/login")
 		}
 
-		// check is user is in db, if not then kick them out
-		if _,err := database.GetDB(cookie.Value); errors.Is(err, custom_errors.UserNotFound){
+		// checks if session is valid then kicks if not
+		if _, err := database.GetSessionFromToken(c.Request().Context(), cookie.Value); errors.Is(err, custom_errors.SessionExpired) {
 			cookie.MaxAge = -1
-			return c.Redirect(http.StatusSeeOther,"/auth/login")
+			return c.Redirect(http.StatusSeeOther, "/auth/login")
 		}
 
 		if err != nil {

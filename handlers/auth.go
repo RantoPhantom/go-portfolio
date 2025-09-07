@@ -5,11 +5,12 @@ import (
 	"learning/go-portfolio/custom_errors"
 	"learning/go-portfolio/database"
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
+
+const COOKIE_NAME string = "session_token"
 
 func AuthRouter(e *echo.Echo) {
 	auth_group := e.Group("/auth")
@@ -52,12 +53,15 @@ func Login(c echo.Context) error {
 		return c.HTML(http.StatusBadRequest, custom_errors.InvalidCredentials.Error())
 	}
 
+	session, err := database.CreateSession(ctx, username)
+
 	cookie := new(http.Cookie)
-	cookie.Name = "username"
-	cookie.Value = username
+	cookie.Name = COOKIE_NAME
+	cookie.Value = session.Token
 	cookie.Path = "/"
-	cookie.Expires = time.Now().Add(12 * time.Hour)
+	cookie.Expires = session.ExpiresAt
 	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteStrictMode
 	c.SetCookie(cookie)
 
 	c.Response().Header().Add("HX-Redirect", "/to-do/")
@@ -65,7 +69,11 @@ func Login(c echo.Context) error {
 }
 
 func Logout(c echo.Context) error {
-	old_cookie, err := c.Cookie("username")
+	old_cookie, err := c.Cookie(COOKIE_NAME)
+	if err != nil {
+		return err
+	}
+	err = database.Remove_Session(c.Request().Context(), old_cookie.Value)
 	if err != nil {
 		return err
 	}
@@ -100,7 +108,7 @@ func Signup(c echo.Context) error {
 	}
 
 	// create the db
-	err = database.CreateDB(username, string(password_hash))
+	err = database.CreateDB(c.Request().Context(), username, string(password_hash))
 	if errors.Is(err, custom_errors.InvalidUsername) {
 		c.Response().Header().Add("HX-Retarget", "#username_error")
 		c.Response().Header().Add("HX-Reswap", "innerHTML")

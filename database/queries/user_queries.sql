@@ -51,6 +51,7 @@ set list_name=?
 where list_id=?;
 
 -- ----user_info-----
+
 -- name: Get_password :one
 select password_hash
 from user_info

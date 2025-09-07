@@ -15,6 +15,14 @@ type List struct {
 	DateCreated time.Time
 }
 
+type Session struct {
+	ID          int64
+	Username    string
+	Token       string
+	ExpiresAt   time.Time
+	DateCreated time.Time
+}
+
 type TodoItem struct {
 	ItemID      int64
 	ListID      int64
