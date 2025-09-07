@@ -14,4 +14,5 @@ var (
 	SessionDbExists         = errors.New("Session Db alr exists")
 	SessionExpired          = errors.New("This session has expired, please log in again.")
 	SessionDbNotInitialized = errors.New("Session db has not been initialized.")
+	EnvEmpty                = errors.New("env var: %s has not been initialized.")
 )

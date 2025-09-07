@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
+	"learning/go-portfolio/custom_errors"
 	"os"
 	"reflect"
 	"strings"
@@ -19,7 +21,7 @@ var AppConfig *Config
 
 // simple env loader
 // ignores line comment but not inline
-func LoadConfig(filepath string) error {
+func LoadConfig(filepath string) {
 	var file *os.File
 	var err error
 	var scanner *bufio.Scanner
@@ -30,7 +32,7 @@ func LoadConfig(filepath string) error {
 
 	file, err = os.Open(filepath)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	defer file.Close()
 
@@ -53,7 +55,7 @@ func LoadConfig(filepath string) error {
 	}
 
 	if err = scanner.Err(); err != nil {
-		return err
+		panic(err)
 	}
 	// read from ENV into Config
 	AppConfig = &Config{}
@@ -66,9 +68,10 @@ func LoadConfig(filepath string) error {
 
 		if field.CanSet() && field.Kind() == reflect.String {
 			val := os.Getenv(field_name)
+			if val == "" {
+				panic(fmt.Errorf(custom_errors.EnvEmpty.Error(), field_name))
+			}
 			field.SetString(val)
 		}
 	}
-
-	return nil
 }
