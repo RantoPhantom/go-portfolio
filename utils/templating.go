@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"html/template"
@@ -15,14 +15,14 @@ type Template struct {
 	templates *template.Template
 }
 
-func (t *Template) Render(writer io.Writer, name string, data interface{}, context echo.Context) error {
+func (t *Template) Render(writer io.Writer, name string, data any, context echo.Context) error {
 	if !strings.Contains(name, ".html") {
 		name += ".html"
 	}
 	return t.templates.ExecuteTemplate(writer, name, data)
 }
 
-func newTemplate() *Template {
+func NewTemplate() *Template {
 	templates := template.New("")
 	err := filepath.Walk("./views", func(path string, info os.FileInfo, err error) error {
 		if strings.Contains(path, ".html") {
